@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>$(Version)</Version>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <AssemblyName>Consul.Net</AssemblyName>
+    <PackageId>Consul.Net</PackageId>
+    <PackageTags>Consul;service discovery;distributed locking;health checking</PackageTags>
+    <PackageReleaseNotes>https://github.com/MikeBairdRocks/Consul.Net/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/MikeBairdRocks/Consul.Net</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/MikeBairdRocks/Consul.Net/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/MikeBairdRocks/Consul.Net</RepositoryUrl>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Threading" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="4.0.0" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Thread" Version="4.0.0" />
+  </ItemGroup>
+</Project>
