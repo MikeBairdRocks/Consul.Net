@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Consul.Net.Exceptions;
@@ -106,7 +106,7 @@ namespace Consul.Net.Models
     /// <exception cref="ConsulConfigurationException">An error that occured while building the configuration.</exception>
     public ConsulClientConfiguration()
     {
-      UriBuilder consulAddress = new UriBuilder("http://127.0.0.1:8500");
+      var consulAddress = new UriBuilder("http://127.0.0.1:8500");
       ConfigureFromEnvironment(consulAddress);
       Address = consulAddress.Uri;
     }
@@ -121,7 +121,7 @@ namespace Consul.Net.Models
       if (!string.IsNullOrEmpty(envAddr))
       {
         var addrParts = envAddr.Split(':');
-        for (int i = 0; i < addrParts.Length; i++)
+        for (var i = 0; i < addrParts.Length; i++)
         {
           addrParts[i] = addrParts[i].Trim();
         }
@@ -206,7 +206,7 @@ namespace Consul.Net.Models
       // Make a temporary copy of the event to avoid possibility of
       // a race condition if the last subscriber unsubscribes
       // immediately after the null check and before the event is raised.
-      EventHandler handler = Updated;
+      var handler = Updated;
 
       // Event will be null if there are no subscribers
       handler?.Invoke(this, e);

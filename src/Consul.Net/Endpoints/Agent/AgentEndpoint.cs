@@ -22,8 +22,6 @@ namespace Consul.Net.Endpoints.Agent
     Task<WriteResult> ForceLeave(string node, CancellationToken ct = default(CancellationToken));
     Task<WriteResult> Join(string addr, bool wan, CancellationToken ct = default(CancellationToken));
     Task<QueryResult<AgentMember[]>> Members(bool wan, CancellationToken ct = default(CancellationToken));
-    [Obsolete("This property will be removed in 0.8.0. Replace uses of it with a call to GetNodeName()")]
-    string NodeName { get; }
     Task<string> GetNodeName(CancellationToken ct = default(CancellationToken));
     Task PassTTL(string checkID, string note, CancellationToken ct = default(CancellationToken));
     Task<QueryResult<Dictionary<string, Dictionary<string, dynamic>>>> Self(CancellationToken ct = default(CancellationToken));
@@ -64,18 +62,6 @@ namespace Consul.Net.Endpoints.Agent
     public Task<QueryResult<Dictionary<string, Dictionary<string, dynamic>>>> Self(CancellationToken ct = default(CancellationToken))
     {
       return _client.Get<Dictionary<string, Dictionary<string, dynamic>>>("/v1/agent/self").Execute(ct);
-    }
-
-    /// <summary>
-    /// NodeName is used to get the node name of the agent
-    /// </summary>
-    [Obsolete("This property will be removed in 0.8.0. Replace uses of it with a call to 'await GetNodeName()'")]
-    public string NodeName
-    {
-      get
-      {
-        return GetNodeName().ConfigureAwait(false).GetAwaiter().GetResult();
-      }
     }
 
     /// <summary>

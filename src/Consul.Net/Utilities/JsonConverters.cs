@@ -64,18 +64,18 @@ namespace Consul.Net.Utilities
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
             JsonSerializer serializer)
         {
-            KVPair result = new KVPair();
+            var result = new KVPair();
             while (reader.Read())
             {
                 if (reader.TokenType == JsonToken.StartObject) { continue; }
                 if (reader.TokenType == JsonToken.EndObject) { return result; }
                 if (reader.TokenType == JsonToken.PropertyName)
                 {
-                    string jsonPropName = reader.Value.ToString();
+                    var jsonPropName = reader.Value.ToString();
                     var propName = objProps.Value.FirstOrDefault(p => p.Equals(jsonPropName, StringComparison.OrdinalIgnoreCase));
                     if (propName != null)
                     {
-                        PropertyInfo pi = result.GetType().GetRuntimeProperty(propName);
+                        var pi = result.GetType().GetRuntimeProperty(propName);
 
                         if (jsonPropName.Equals("Flags", StringComparison.OrdinalIgnoreCase))
                         {
