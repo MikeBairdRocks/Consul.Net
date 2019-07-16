@@ -14,26 +14,11 @@ namespace Consul.Net.Endpoints.Agent
     public string Status { get; private set; }
     internal string LegacyStatus { get; private set; }
 
-    public static TTLStatus Pass
-    {
-      get { return passingStatus; }
-    }
+    public static TTLStatus Pass => passingStatus;
 
-    public static TTLStatus Warn
-    {
-      get { return warningStatus; }
-    }
+    public static TTLStatus Warn => warningStatus;
 
-    public static TTLStatus Critical
-    {
-      get { return criticalStatus; }
-    }
-
-    [Obsolete("Use TTLStatus.Critical instead. This status will be an error in 0.7.0+", true)]
-    public static TTLStatus Fail
-    {
-      get { return criticalStatus; }
-    }
+    public static TTLStatus Critical => criticalStatus;
 
     public bool Equals(TTLStatus other)
     {

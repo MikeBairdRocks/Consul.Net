@@ -44,11 +44,9 @@ namespace Consul.Net.Tests
 
       Assert.Equal(addr, string.Format("{0}:{1}", config.Address.Host, config.Address.Port));
       Assert.Equal(token, config.Token);
-#pragma warning disable CS0618 // Type or member is obsolete
       Assert.NotNull(config.HttpAuth);
       Assert.Equal("username", config.HttpAuth.UserName);
       Assert.Equal("password", config.HttpAuth.Password);
-#pragma warning restore CS0618 // Type or member is obsolete
       Assert.Equal("https", config.Address.Scheme);
 
       Environment.SetEnvironmentVariable("CONSUL_HTTP_ADDR", string.Empty);
@@ -124,20 +122,16 @@ namespace Consul.Net.Tests
     [Fact]
     public async Task Client_CustomHttpClient()
     {
-      using (var hc = new HttpClient())
+      using (var client = new ConsulClient(x => new ConsulClientConfiguration(), hc =>
       {
         hc.Timeout = TimeSpan.FromDays(10);
         hc.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-#pragma warning disable CS0618 // Type or member is obsolete
-        using (var client = new ConsulClient(new ConsulClientConfiguration(), hc))
-#pragma warning restore CS0618 // Type or member is obsolete
-        {
-          await client.KV.Put(new KVPair("customhttpclient") {Value = System.Text.Encoding.UTF8.GetBytes("hello world")});
-          Assert.Equal(TimeSpan.FromDays(10), client.HttpClient.Timeout);
-          Assert.True(client.HttpClient.DefaultRequestHeaders.Accept.Contains(new MediaTypeWithQualityHeaderValue("application/json")));
-        }
-
-        Assert.Equal("hello world", await (await hc.GetAsync("http://localhost:8500/v1/kv/customhttpclient?raw")).Content.ReadAsStringAsync());
+      }))
+      {
+        await client.KV.Put(new KVPair("customhttpclient") {Value = System.Text.Encoding.UTF8.GetBytes("hello world")});
+        Assert.Equal(TimeSpan.FromDays(10), client.HttpClient.Timeout);
+        Assert.True(client.HttpClient.DefaultRequestHeaders.Accept.Contains(new MediaTypeWithQualityHeaderValue("application/json")));
+        Assert.Equal("hello world", await (await client.HttpClient.GetAsync("http://localhost:8500/v1/kv/customhttpclient?raw")).Content.ReadAsStringAsync());
       }
     }
 
@@ -161,33 +155,21 @@ namespace Consul.Net.Tests
     [Fact]
     public async Task Client_ReuseAndUpdateConfig()
     {
-      var config = new ConsulClientConfiguration();
-
-#pragma warning disable CS0618 // Type or member is obsolete
-      using (var client = new ConsulClient(config))
-#pragma warning restore CS0618 // Type or member is obsolete
+      using (var client = new ConsulClient(c => new ConsulClientConfiguration()))
       {
-#pragma warning disable CS0618 // Type or member is obsolete
-        config.DisableServerCertificateValidation = true;
-#pragma warning restore CS0618 // Type or member is obsolete
+        client.Config.DisableServerCertificateValidation = true;
         await client.KV.Put(new KVPair("kv/reuseconfig") {Flags = 1000});
         Assert.Equal<ulong>(1000, (await client.KV.Get("kv/reuseconfig")).Response.Flags);
       }
 
-#pragma warning disable CS0618 // Type or member is obsolete
-      using (var client = new ConsulClient(config))
-#pragma warning restore CS0618 // Type or member is obsolete
+      using (var client = new ConsulClient(c => new ConsulClientConfiguration()))
       {
-#pragma warning disable CS0618 // Type or member is obsolete
-        config.DisableServerCertificateValidation = false;
-#pragma warning restore CS0618 // Type or member is obsolete
+        client.Config.DisableServerCertificateValidation = false;
         await client.KV.Put(new KVPair("kv/reuseconfig") {Flags = 2000});
         Assert.Equal<ulong>(2000, (await client.KV.Get("kv/reuseconfig")).Response.Flags);
       }
 
-#pragma warning disable CS0618 // Type or member is obsolete
-      using (var client = new ConsulClient(config))
-#pragma warning restore CS0618 // Type or member is obsolete
+      using (var client = new ConsulClient(c => new ConsulClientConfiguration()))
       {
         await client.KV.Delete("kv/reuseconfig");
       }
@@ -227,20 +209,6 @@ namespace Consul.Net.Tests
         Assert.Equal("foo", c.Config.Datacenter);
         Assert.Equal(TimeSpan.FromSeconds(30), c.HttpClient.Timeout);
       }
-
-#if !CORECLR
-      using (var c = new ConsulClient(cfgAction,
-        (client) => { client.Timeout = TimeSpan.FromSeconds(30); },
-        (handler) => { handler.Proxy = new WebProxy("127.0.0.1", 8080); }))
-      {
-        Assert.NotNull(c.Config);
-        Assert.NotNull(c.HttpHandler);
-        Assert.NotNull(c.HttpClient);
-        Assert.Equal("foo", c.Config.Datacenter);
-        Assert.Equal(TimeSpan.FromSeconds(30), c.HttpClient.Timeout);
-        Assert.NotNull(c.HttpHandler.Proxy);
-      }
-#endif
     }
   }
 }

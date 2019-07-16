@@ -35,18 +35,10 @@ namespace Consul.Net
     IDistributedLock CreateLock(LockOptions opts);
     IDistributedLock CreateLock(string key);
     IEventEndpoint Event { get; }
-    Task ExecuteInSemaphore(SemaphoreOptions opts, Action a, CancellationToken ct = default);
-    Task ExecuteInSemaphore(string prefix, int limit, Action a, CancellationToken ct = default);
-    Task ExecuteLocked(LockOptions opts, Action action, CancellationToken cancellationToken = default);
-
-    [Obsolete("This method will be removed in 0.8.0. Replace calls with the method signature ExecuteLocked(LockOptions, Action, CancellationToken)")]
-    Task ExecuteLocked(LockOptions opts, CancellationToken ct, Action action);
-
-    Task ExecuteLocked(string key, Action action, CancellationToken cancellationToken = default);
-
-    [Obsolete("This method will be removed in 0.8.0. Replace calls with the method signature ExecuteLocked(string, Action, CancellationToken)")]
-    Task ExecuteLocked(string key, CancellationToken ct, Action action);
-
+    Task ExecuteInSemaphore(SemaphoreOptions opts, Action a, CancellationToken ct = default(CancellationToken));
+    Task ExecuteInSemaphore(string prefix, int limit, Action a, CancellationToken ct = default(CancellationToken));
+    Task ExecuteLocked(LockOptions opts, Action action, CancellationToken ct = default(CancellationToken));
+    Task ExecuteLocked(string key, Action action, CancellationToken ct = default(CancellationToken));
     IHealthEndpoint Health { get; }
     IKVEndpoint KV { get; }
     IRawEndpoint Raw { get; }
@@ -61,97 +53,84 @@ namespace Consul.Net
   }
 
   /// <summary>
-  /// Represents a persistant connection to a Consul agent. Instances of this class should be created rarely and reused often.
+  /// Represents a persistent connection to a Consul agent. Instances of this class should be created rarely and reused often.
   /// </summary>
   public class ConsulClient : IConsulClient
   {
     private Lazy<ACLEndpoint> _acl;
-
+    private Lazy<CatalogEndpoint> _catalog;
+    private Lazy<HealthEndpoint> _health;
+    private Lazy<CoordinateEndpoint> _coordinate;
+    private Lazy<EventEndpoint> _event;
+    private Lazy<KVEndpoint> _kv;
+    private Lazy<OperatorEndpoint> _operator;
+    private Lazy<PreparedQueryEndpoint> _preparedQuery;
+    private Lazy<SessionEndpoint> _session;
+    private Lazy<SnapshotEndpoint> _snapshot;
+    private Lazy<StatusEndpoint> _status;
+    private Lazy<RawEndpoint> _raw;
+    private Lazy<AgentEndpoint> _agent;
+    
     /// <summary>
     /// ACL returns a handle to the ACL endpoints
     /// </summary>
     public IACLEndpoint ACL => _acl.Value;
-
-    private Lazy<CatalogEndpoint> _catalog;
 
     /// <summary>
     /// Catalog returns a handle to the catalog endpoints
     /// </summary>
     public ICatalogEndpoint Catalog => _catalog.Value;
 
-    private Lazy<HealthEndpoint> _health;
-
     /// <summary>
     /// Health returns a handle to the health endpoint
     /// </summary>
     public IHealthEndpoint Health => _health.Value;
-
-
-    private Lazy<CoordinateEndpoint> _coordinate;
 
     /// <summary>
     /// Session returns a handle to the session endpoints
     /// </summary>
     public ICoordinateEndpoint Coordinate => _coordinate.Value;
 
-    private Lazy<EventEndpoint> _event;
-
     /// <summary>
     /// Event returns a handle to the event endpoints
     /// </summary>
     public IEventEndpoint Event => _event.Value;
-
-    private Lazy<KVEndpoint> _kv;
 
     /// <summary>
     /// KV returns a handle to the KV endpoint
     /// </summary>
     public IKVEndpoint KV => _kv.Value;
 
-    private Lazy<OperatorEndpoint> _operator;
-
     /// <summary>
     /// Operator returns a handle to the operator endpoints.
     /// </summary>
     public IOperatorEndpoint Operator => _operator.Value;
 
-    private Lazy<PreparedQueryEndpoint> _preparedquery;
-
     /// <summary>
     /// Catalog returns a handle to the catalog endpoints
     /// </summary>
-    public IPreparedQueryEndpoint PreparedQuery => _preparedquery.Value;
-
-    private Lazy<SessionEndpoint> _session;
+    public IPreparedQueryEndpoint PreparedQuery => _preparedQuery.Value;
 
     /// <summary>
     /// Session returns a handle to the session endpoint
     /// </summary>
     public ISessionEndpoint Session => _session.Value;
 
-    private Lazy<SnapshotEndpoint> _snapshot;
-
     /// <summary>
     /// Catalog returns a handle to the snapshot endpoints
     /// </summary>
     public ISnapshotEndpoint Snapshot => _snapshot.Value;
-
-    private Lazy<StatusEndpoint> _status;
 
     /// <summary>
     /// Status returns a handle to the status endpoint
     /// </summary>
     public IStatusEndpoint Status => _status.Value;
 
-    private Lazy<RawEndpoint> _raw;
-
     /// <summary>
     /// Raw returns a handle to query endpoints
     /// </summary>
     public IRawEndpoint Raw => _raw.Value;
     
-    private Lazy<AgentEndpoint> _agent;
-
     /// <summary>
     /// Agent returns a handle to the agent endpoints
     /// </summary>
@@ -180,29 +159,6 @@ namespace Consul.Net
         HttpClient.DefaultRequestHeaders.Add("Keep-Alive", "true");
       }
 
-      #region Old style config handling
-
-      public ConsulClientConfigurationContainer(ConsulClientConfiguration config, HttpClient client)
-      {
-        skipClientDispose = true;
-        Config = config;
-        HttpClient = client;
-      }
-
-      public ConsulClientConfigurationContainer(ConsulClientConfiguration config)
-      {
-        Config = config;
-        HttpHandler = new HttpClientHandler();
-        HttpClient = new HttpClient(HttpHandler);
-        HttpClient.Timeout = TimeSpan.FromMinutes(15);
-        HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        HttpClient.DefaultRequestHeaders.Add("Keep-Alive", "true");
-      }
-
-      #endregion
-
-      #region IDisposable Support
-
       private bool disposedValue = false; // To detect redundant calls
 
       protected virtual void Dispose(bool disposing)
@@ -226,12 +182,6 @@ namespace Consul.Net
         }
       }
 
-      //~ConsulClient()
-      //{
-      //    // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-      //    Dispose(false);
-      //}
-
       // This code added to correctly implement the disposable pattern.
       public void Dispose()
       {
@@ -247,30 +197,17 @@ namespace Consul.Net
           throw new ObjectDisposedException(typeof(ConsulClientConfigurationContainer).FullName.ToString());
         }
       }
-
-      #endregion
     }
 
     private ConsulClientConfigurationContainer ConfigContainer;
 
-    internal HttpClient HttpClient
-    {
-      get { return ConfigContainer.HttpClient; }
-    }
+    internal HttpClient HttpClient => ConfigContainer.HttpClient;
 
-    internal HttpClientHandler HttpHandler
-    {
-      get { return ConfigContainer.HttpHandler; }
-    }
+    internal HttpClientHandler HttpHandler => ConfigContainer.HttpHandler;
 
-    public ConsulClientConfiguration Config
-    {
-      get { return ConfigContainer.Config; }
-    }
+    public ConsulClientConfiguration Config => ConfigContainer.Config;
 
     internal readonly JsonSerializer serializer = new JsonSerializer();
-
-    #region New style config with Actions
 
     /// <summary>
     /// Initializes a new Consul client with a default configuration that connects to 127.0.0.1:8500.
@@ -321,48 +258,6 @@ namespace Consul.Net
       InitializeEndpoints();
     }
 
-    #endregion
-
-    #region Old style config
-
-    /// <summary>
-    /// Initializes a new Consul client with the configuration specified.
-    /// </summary>
-    /// <param name="config">A Consul client configuration</param>
-    [Obsolete("This constructor is no longer necessary due to the new Action based constructors and will be removed when 0.8.0 is released." +
-              "Please use the ConsulClient(Action<ConsulClientConfiguration>) constructor to set configuration options.", false)]
-    public ConsulClient(ConsulClientConfiguration config)
-    {
-      config.Updated += HandleConfigUpdateEvent;
-      var ctr = new ConsulClientConfigurationContainer(config);
-      ApplyConfig(ctr.Config, ctr.HttpHandler, ctr.HttpClient);
-
-      ConfigContainer = ctr;
-      InitializeEndpoints();
-    }
-
-    /// <summary>
-    /// Initializes a new Consul client with the configuration specified and a custom HttpClient, which is useful for setting proxies/custom timeouts.
-    /// The HttpClient must accept the "application/json" content type and the Timeout property should be set to at least 15 minutes to allow for blocking queries.
-    /// </summary>
-    /// <param name="config">A Consul client configuration</param>
-    /// <param name="client">A custom HttpClient</param>
-    [Obsolete("This constructor is no longer necessary due to the new Action based constructors and will be removed when 0.8.0 is released." +
-              "Please use one of the ConsulClient(Action<>) constructors instead to set internal options on the HttpClient/WebRequestHandler.", false)]
-    public ConsulClient(ConsulClientConfiguration config, HttpClient client)
-    {
-      var ctr = new ConsulClientConfigurationContainer(config, client);
-      if (!ctr.HttpClient.DefaultRequestHeaders.Accept.Contains(new MediaTypeWithQualityHeaderValue("application/json")))
-      {
-        throw new ArgumentException("HttpClient must accept the application/json content type", nameof(client));
-      }
-
-      ConfigContainer = ctr;
-      InitializeEndpoints();
-    }
-
-    #endregion
-
     private void InitializeEndpoints()
     {
       _acl = new Lazy<ACLEndpoint>(() => new ACLEndpoint(this));
@@ -373,7 +268,7 @@ namespace Consul.Net
       _health = new Lazy<HealthEndpoint>(() => new HealthEndpoint(this));
       _kv = new Lazy<KVEndpoint>(() => new KVEndpoint(this));
       _operator = new Lazy<OperatorEndpoint>(() => new OperatorEndpoint(this));
-      _preparedquery = new Lazy<PreparedQueryEndpoint>(() => new PreparedQueryEndpoint(this));
+      _preparedQuery = new Lazy<PreparedQueryEndpoint>(() => new PreparedQueryEndpoint(this));
       _raw = new Lazy<RawEndpoint>(() => new RawEndpoint(this));
       _session = new Lazy<SessionEndpoint>(() => new SessionEndpoint(this));
       _snapshot = new Lazy<SnapshotEndpoint>(() => new SnapshotEndpoint(this));
@@ -411,7 +306,8 @@ namespace Consul.Net
       }
       return new Semaphore(this) { Opts = opts };
     }
-    public Task<IDistributedSemaphore> AcquireSemaphore(string prefix, int limit, CancellationToken ct = default)
+    
+    public Task<IDistributedSemaphore> AcquireSemaphore(string prefix, int limit, CancellationToken ct = default(CancellationToken))
     {
       if (string.IsNullOrEmpty(prefix))
       {
@@ -423,7 +319,8 @@ namespace Consul.Net
       }
       return AcquireSemaphore(new SemaphoreOptions(prefix, limit), ct);
     }
-    public async Task<IDistributedSemaphore> AcquireSemaphore(SemaphoreOptions opts, CancellationToken ct = default)
+    
+    public async Task<IDistributedSemaphore> AcquireSemaphore(SemaphoreOptions opts, CancellationToken ct = default(CancellationToken))
     {
       if (opts == null)
       {
@@ -579,46 +476,8 @@ namespace Consul.Net
       {
         await l.Release().ConfigureAwait(false);
       }
-
     }
-    /// <summary>
-    /// ExecuteLock accepts a delegate to execute in the context of a lock, releasing the lock when completed.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <param name="ct"></param>
-    /// <param name="action"></param>
-    /// <returns></returns>
-    [Obsolete("This method will be removed in 0.8.0. Replace calls with the method signature ExecuteLocked(string, Action, CancellationToken)")]
-    public Task ExecuteLocked(string key, CancellationToken ct, Action action)
-    {
-      if (string.IsNullOrEmpty(key))
-      {
-        throw new ArgumentNullException(nameof(key));
-      }
-      if (action == null)
-      {
-        throw new ArgumentNullException(nameof(action));
-      }
-      return ExecuteLocked(new LockOptions(key), action, ct);
-    }
-
-    /// <summary>
-    /// ExecuteLock accepts a delegate to execute in the context of a lock, releasing the lock when completed.
-    /// </summary>
-    /// <param name="opts"></param>
-    /// <param name="ct"></param>
-    /// <param name="action"></param>
-    /// <returns></returns>
-    [Obsolete("This method will be removed in 0.8.0. Replace calls with the method signature ExecuteLocked(LockOptions, Action, CancellationToken)")]
-    public Task ExecuteLocked(LockOptions opts, CancellationToken ct, Action action)
-    {
-      if (opts == null)
-      {
-        throw new ArgumentNullException(nameof(opts));
-      }
-      return ExecuteLocked(opts, action, ct);
-    }
-
+    
     private bool disposedValue = false; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)
@@ -649,7 +508,7 @@ namespace Consul.Net
     public void CheckDisposed()
     {
       if (disposedValue)
-        throw new ObjectDisposedException(typeof(ConsulClient).FullName.ToString());
+        throw new ObjectDisposedException(typeof(ConsulClient).FullName);
     }
 
     void HandleConfigUpdateEvent(object sender, EventArgs e)
