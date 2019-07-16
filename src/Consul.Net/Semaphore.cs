@@ -126,9 +126,9 @@ namespace Consul.Net
   {
     bool IsHeld { get; }
 
-    Task<CancellationToken> Acquire(CancellationToken ct = default(CancellationToken));
-    Task Destroy(CancellationToken ct = default(CancellationToken));
-    Task Release(CancellationToken ct = default(CancellationToken));
+    Task<CancellationToken> Acquire(CancellationToken ct = default);
+    Task Destroy(CancellationToken ct = default);
+    Task Release(CancellationToken ct = default);
   }
   
   /// <summary>
@@ -342,8 +342,7 @@ namespace Consul.Net
             {
               DisposeCancellationTokenSource();
               throw new SemaphoreLimitConflictException(
-                  string.Format("Semaphore limit conflict (lock: {0}, local: {1})", semaphoreLock.Limit,
-                      Opts.Limit),
+                $"Semaphore limit conflict (lock: {semaphoreLock.Limit}, local: {Opts.Limit})",
                   semaphoreLock.Limit, Opts.Limit);
             }
 
@@ -403,7 +402,7 @@ namespace Consul.Net
     /// <summary>
     /// Release is used to voluntarily give up our semaphore slot. It is an error to call this if the semaphore has not been acquired.
     /// </summary>
-    public async Task Release(CancellationToken ct = default(CancellationToken))
+    public async Task Release(CancellationToken ct = default)
     {
       try
       {
@@ -472,7 +471,7 @@ namespace Consul.Net
     /// <summary>
     /// Destroy is used to cleanup the semaphore entry. It is not necessary to invoke. It will fail if the semaphore is in use.
     /// </summary>
-    public async Task Destroy(CancellationToken ct = default(CancellationToken))
+    public async Task Destroy(CancellationToken ct = default)
     {
       using (await _mutex.LockAsync().ConfigureAwait(false))
       {

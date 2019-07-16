@@ -5,8 +5,8 @@ namespace Consul.Net.Endpoints.Status
 {
   public interface IStatusEndpoint
   {
-    Task<string> Leader(CancellationToken ct = default(CancellationToken));
-    Task<string[]> Peers(CancellationToken ct = default(CancellationToken));
+    Task<string> Leader(CancellationToken ct = default);
+    Task<string[]> Peers(CancellationToken ct = default);
   }
   
   public class StatusEndpoint : IStatusEndpoint
@@ -22,7 +22,7 @@ namespace Consul.Net.Endpoints.Status
     /// Leader is used to query for a known leader
     /// </summary>
     /// <returns>A write result containing the leader node name</returns>
-    public async Task<string> Leader(CancellationToken ct = default(CancellationToken))
+    public async Task<string> Leader(CancellationToken ct = default)
     {
       var res = await _client.Get<string>("/v1/status/leader").Execute(ct).ConfigureAwait(false);
       return res.Response;
@@ -32,7 +32,7 @@ namespace Consul.Net.Endpoints.Status
     /// Peers is used to query for a known raft peers
     /// </summary>
     /// <returns>A write result containing the list of Raft peers</returns>
-    public async Task<string[]> Peers(CancellationToken ct = default(CancellationToken))
+    public async Task<string[]> Peers(CancellationToken ct = default)
     {
       var res = await _client.Get<string[]>("/v1/status/peers").Execute(ct).ConfigureAwait(false);
       return res.Response;

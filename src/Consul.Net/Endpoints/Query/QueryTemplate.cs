@@ -7,6 +7,11 @@ namespace Consul.Net.Endpoints.Query
   /// </summary>
   public class QueryTemplate
   {
+    public QueryTemplate()
+    {
+      Type = "name_prefix_match";
+    }
+    
     /// <summary>
     /// Type specifies the type of the query template. Currently only
     /// "name_prefix_match" is supported. This field is required.
@@ -21,9 +26,11 @@ namespace Consul.Net.Endpoints.Query
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string Regexp { get; set; }
 
-    public QueryTemplate()
-    {
-      Type = "name_prefix_match";
-    }
+    /// <summary>
+    /// Regexp allows specifying a regex pattern to match against the name
+    /// of the query being executed.
+    /// </summary>
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public bool RemoveEmptyTags { get; set; }
   }
 }

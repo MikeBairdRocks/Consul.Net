@@ -9,12 +9,12 @@ namespace Consul.Net.Endpoints.Event
 {
   public interface IEventEndpoint
   {
-    Task<WriteResult<string>> Fire(UserEvent ue, CancellationToken ct = default(CancellationToken));
-    Task<WriteResult<string>> Fire(UserEvent ue, WriteOptions q, CancellationToken ct = default(CancellationToken));
+    Task<WriteResult<string>> Fire(UserEvent ue, CancellationToken ct = default);
+    Task<WriteResult<string>> Fire(UserEvent ue, WriteOptions q, CancellationToken ct = default);
     ulong IDToIndex(string uuid);
-    Task<QueryResult<UserEvent[]>> List(CancellationToken ct = default(CancellationToken));
-    Task<QueryResult<UserEvent[]>> List(string name, CancellationToken ct = default(CancellationToken));
-    Task<QueryResult<UserEvent[]>> List(string name, QueryOptions q, CancellationToken ct = default(CancellationToken));
+    Task<QueryResult<UserEvent[]>> List(CancellationToken ct = default);
+    Task<QueryResult<UserEvent[]>> List(string name, CancellationToken ct = default);
+    Task<QueryResult<UserEvent[]>> List(string name, QueryOptions q, CancellationToken ct = default);
   }
   
   public class EventEndpoint : IEventEndpoint
@@ -32,7 +32,7 @@ namespace Consul.Net.Endpoints.Event
       _client = c;
     }
 
-    public Task<WriteResult<string>> Fire(UserEvent ue, CancellationToken ct = default(CancellationToken))
+    public Task<WriteResult<string>> Fire(UserEvent ue, CancellationToken ct = default)
     {
       return Fire(ue, WriteOptions.Default, ct);
     }
@@ -43,9 +43,9 @@ namespace Consul.Net.Endpoints.Event
     /// <param name="ue">A User Event definition</param>
     /// <param name="q">Customized write options</param>
     /// <returns></returns>
-    public async Task<WriteResult<string>> Fire(UserEvent ue, WriteOptions q, CancellationToken ct = default(CancellationToken))
+    public async Task<WriteResult<string>> Fire(UserEvent ue, WriteOptions q, CancellationToken ct = default)
     {
-      var req = _client.Put<byte[], EventCreationResult>(string.Format("/v1/event/fire/{0}", ue.Name), ue.Payload, q);
+      var req = _client.Put<byte[], EventCreationResult>($"/v1/event/fire/{ue.Name}", ue.Payload, q);
       if (!string.IsNullOrEmpty(ue.NodeFilter))
       {
         req.Params["node"] = ue.NodeFilter;
@@ -66,7 +66,7 @@ namespace Consul.Net.Endpoints.Event
     /// List is used to get the most recent events an agent has received. This list can be optionally filtered by the name. This endpoint supports quasi-blocking queries. The index is not monotonic, nor does it provide provide LastContact or KnownLeader.
     /// </summary>
     /// <returns>An array of events</returns>
-    public Task<QueryResult<UserEvent[]>> List(CancellationToken ct = default(CancellationToken))
+    public Task<QueryResult<UserEvent[]>> List(CancellationToken ct = default)
     {
       return List(string.Empty, QueryOptions.Default, ct);
     }
@@ -76,7 +76,7 @@ namespace Consul.Net.Endpoints.Event
     /// </summary>
     /// <param name="name">The name of the event to filter for</param>
     /// <returns>An array of events</returns>
-    public Task<QueryResult<UserEvent[]>> List(string name, CancellationToken ct = default(CancellationToken))
+    public Task<QueryResult<UserEvent[]>> List(string name, CancellationToken ct = default)
     {
       return List(name, QueryOptions.Default, ct);
     }

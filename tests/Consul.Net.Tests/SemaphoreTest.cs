@@ -311,7 +311,7 @@ namespace Consul.Net.Tests
         }
         else
         {
-          Assert.True(false, "Contender " + i.ToString() + " did not acquire the lock");
+          Assert.True(false, $"Contender {i} did not acquire the lock");
         }
       }
     }

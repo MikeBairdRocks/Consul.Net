@@ -7,7 +7,7 @@ namespace Consul.Net.Models
   /// </summary>
   public class QueryOptions
   {
-    public static readonly QueryOptions Default = new QueryOptions()
+    public static readonly QueryOptions Default = new QueryOptions
     {
       Consistency = ConsistencyMode.Default,
       Datacenter = string.Empty,

@@ -26,23 +26,23 @@ namespace Consul.Net
   public interface IConsulClient : IDisposable
   {
     IACLEndpoint ACL { get; }
-    Task<IDistributedLock> AcquireLock(LockOptions opts, CancellationToken ct = default(CancellationToken));
-    Task<IDistributedLock> AcquireLock(string key, CancellationToken ct = default(CancellationToken));
-    Task<IDistributedSemaphore> AcquireSemaphore(SemaphoreOptions opts, CancellationToken ct = default(CancellationToken));
-    Task<IDistributedSemaphore> AcquireSemaphore(string prefix, int limit, CancellationToken ct = default(CancellationToken));
+    Task<IDistributedLock> AcquireLock(LockOptions opts, CancellationToken ct = default);
+    Task<IDistributedLock> AcquireLock(string key, CancellationToken ct = default);
+    Task<IDistributedSemaphore> AcquireSemaphore(SemaphoreOptions opts, CancellationToken ct = default);
+    Task<IDistributedSemaphore> AcquireSemaphore(string prefix, int limit, CancellationToken ct = default);
     IAgentEndpoint Agent { get; }
     ICatalogEndpoint Catalog { get; }
     IDistributedLock CreateLock(LockOptions opts);
     IDistributedLock CreateLock(string key);
     IEventEndpoint Event { get; }
-    Task ExecuteInSemaphore(SemaphoreOptions opts, Action a, CancellationToken ct = default(CancellationToken));
-    Task ExecuteInSemaphore(string prefix, int limit, Action a, CancellationToken ct = default(CancellationToken));
-    Task ExecuteLocked(LockOptions opts, Action action, CancellationToken ct = default(CancellationToken));
+    Task ExecuteInSemaphore(SemaphoreOptions opts, Action a, CancellationToken ct = default);
+    Task ExecuteInSemaphore(string prefix, int limit, Action a, CancellationToken ct = default);
+    Task ExecuteLocked(LockOptions opts, Action action, CancellationToken cancellationToken = default);
 
     [Obsolete("This method will be removed in 0.8.0. Replace calls with the method signature ExecuteLocked(LockOptions, Action, CancellationToken)")]
     Task ExecuteLocked(LockOptions opts, CancellationToken ct, Action action);
 
-    Task ExecuteLocked(string key, Action action, CancellationToken ct = default(CancellationToken));
+    Task ExecuteLocked(string key, Action action, CancellationToken cancellationToken = default);
 
     [Obsolete("This method will be removed in 0.8.0. Replace calls with the method signature ExecuteLocked(string, Action, CancellationToken)")]
     Task ExecuteLocked(string key, CancellationToken ct, Action action);
@@ -411,7 +411,7 @@ namespace Consul.Net
       }
       return new Semaphore(this) { Opts = opts };
     }
-    public Task<IDistributedSemaphore> AcquireSemaphore(string prefix, int limit, CancellationToken ct = default(CancellationToken))
+    public Task<IDistributedSemaphore> AcquireSemaphore(string prefix, int limit, CancellationToken ct = default)
     {
       if (string.IsNullOrEmpty(prefix))
       {
@@ -423,7 +423,7 @@ namespace Consul.Net
       }
       return AcquireSemaphore(new SemaphoreOptions(prefix, limit), ct);
     }
-    public async Task<IDistributedSemaphore> AcquireSemaphore(SemaphoreOptions opts, CancellationToken ct = default(CancellationToken))
+    public async Task<IDistributedSemaphore> AcquireSemaphore(SemaphoreOptions opts, CancellationToken ct = default)
     {
       if (opts == null)
       {
@@ -435,7 +435,7 @@ namespace Consul.Net
       return semaphore;
     }
 
-    public Task ExecuteInSemaphore(string prefix, int limit, Action a, CancellationToken ct = default(CancellationToken))
+    public Task ExecuteInSemaphore(string prefix, int limit, Action a, CancellationToken ct = default)
     {
       if (string.IsNullOrEmpty(prefix))
       {
@@ -448,7 +448,7 @@ namespace Consul.Net
       return ExecuteInSemaphore(new SemaphoreOptions(prefix, limit), a, ct);
     }
 
-    public async Task ExecuteInSemaphore(SemaphoreOptions opts, Action a, CancellationToken ct = default(CancellationToken))
+    public async Task ExecuteInSemaphore(SemaphoreOptions opts, Action a, CancellationToken ct = default)
     {
       if (opts == null)
       {
@@ -509,7 +509,7 @@ namespace Consul.Net
     /// <param name="key"></param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    public Task<IDistributedLock> AcquireLock(string key, CancellationToken ct = default(CancellationToken))
+    public Task<IDistributedLock> AcquireLock(string key, CancellationToken ct = default)
     {
       if (string.IsNullOrEmpty(key))
       {
@@ -524,7 +524,7 @@ namespace Consul.Net
     /// <param name="opts"></param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    public async Task<IDistributedLock> AcquireLock(LockOptions opts, CancellationToken ct = default(CancellationToken))
+    public async Task<IDistributedLock> AcquireLock(LockOptions opts, CancellationToken ct = default)
     {
       if (opts == null)
       {
@@ -542,13 +542,13 @@ namespace Consul.Net
     /// <param name="key"></param>
     /// <param name="action"></param>
     /// <returns></returns>
-    public Task ExecuteLocked(string key, Action action, CancellationToken ct = default(CancellationToken))
+    public Task ExecuteLocked(string key, Action action, CancellationToken cancellationToken = default)
     {
       if (string.IsNullOrEmpty(key))
       {
         throw new ArgumentNullException(nameof(key));
       }
-      return ExecuteLocked(new LockOptions(key), action, ct);
+      return ExecuteLocked(new LockOptions(key), action, cancellationToken);
     }
 
     /// <summary>
@@ -557,18 +557,15 @@ namespace Consul.Net
     /// <param name="opts"></param>
     /// <param name="action"></param>
     /// <returns></returns>
-    public async Task ExecuteLocked(LockOptions opts, Action action, CancellationToken ct = default(CancellationToken))
+    public async Task ExecuteLocked(LockOptions opts, Action action, CancellationToken cancellationToken = default)
     {
       if (opts == null)
-      {
         throw new ArgumentNullException(nameof(opts));
-      }
+      
       if (action == null)
-      {
         throw new ArgumentNullException(nameof(action));
-      }
 
-      var l = await AcquireLock(opts, ct).ConfigureAwait(false);
+      var l = await AcquireLock(opts, cancellationToken).ConfigureAwait(false);
 
       try
       {
@@ -621,8 +618,6 @@ namespace Consul.Net
       }
       return ExecuteLocked(opts, action, ct);
     }
-    
-    #region IDisposable Support
 
     private bool disposedValue = false; // To detect redundant calls
 
@@ -643,12 +638,6 @@ namespace Consul.Net
       }
     }
 
-    //~ConsulClient()
-    //{
-    //    // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-    //    Dispose(false);
-    //}
-
     // This code added to correctly implement the disposable pattern.
     public void Dispose()
     {
@@ -660,12 +649,8 @@ namespace Consul.Net
     public void CheckDisposed()
     {
       if (disposedValue)
-      {
         throw new ObjectDisposedException(typeof(ConsulClient).FullName.ToString());
-      }
     }
-
-    #endregion
 
     void HandleConfigUpdateEvent(object sender, EventArgs e)
     {

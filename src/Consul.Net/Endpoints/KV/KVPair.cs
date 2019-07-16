@@ -41,7 +41,7 @@ namespace Consul.Net.Endpoints.KV
       }
       else if (path[0] == '/')
       {
-        throw new InvalidKeyPairException(string.Format("Invalid key. Key must not begin with a '/': {0}", path));
+        throw new InvalidKeyPairException($"Invalid key. Key must not begin with a '/': {path}");
       }
     }
   }

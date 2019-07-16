@@ -59,13 +59,11 @@ namespace Consul.Net.Models
       {
         if (ResponseStream == null)
         {
-          throw new ConsulRequestException(string.Format("Unexpected response, status code {0}",
-            response.StatusCode), response.StatusCode);
+          throw new ConsulRequestException($"Unexpected response, status code {response.StatusCode}", response.StatusCode);
         }
         using (var sr = new StreamReader(ResponseStream))
         {
-          throw new ConsulRequestException(string.Format("Unexpected response, status code {0}: {1}",
-            response.StatusCode, sr.ReadToEnd()), response.StatusCode);
+          throw new ConsulRequestException($"Unexpected response, status code {response.StatusCode}: {sr.ReadToEnd()}", response.StatusCode);
         }
       }
 
@@ -149,13 +147,11 @@ namespace Consul.Net.Models
       {
         if (ResponseStream == null)
         {
-          throw new ConsulRequestException(string.Format("Unexpected response, status code {0}",
-              response.StatusCode), response.StatusCode);
+          throw new ConsulRequestException($"Unexpected response, status code {response.StatusCode}", response.StatusCode);
         }
         using (var sr = new StreamReader(ResponseStream))
         {
-          throw new ConsulRequestException(string.Format("Unexpected response, status code {0}: {1}",
-              response.StatusCode, sr.ReadToEnd()), response.StatusCode);
+          throw new ConsulRequestException($"Unexpected response, status code {response.StatusCode}: {sr.ReadToEnd()}", response.StatusCode);
         }
       }
 

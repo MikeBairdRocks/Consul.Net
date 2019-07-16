@@ -14,9 +14,9 @@ namespace Consul.Net.Tests
     public static void RunSync(Func<Task> task)
     {
       var oldContext = SynchronizationContext.Current;
-      var synch = new ExclusiveSynchronizationContext();
-      SynchronizationContext.SetSynchronizationContext(synch);
-      synch.Post(async _ =>
+      var sync = new ExclusiveSynchronizationContext();
+      SynchronizationContext.SetSynchronizationContext(sync);
+      sync.Post(async _ =>
       {
         try
         {
@@ -24,15 +24,15 @@ namespace Consul.Net.Tests
         }
         catch (Exception e)
         {
-          synch.InnerException = e;
+          sync.InnerException = e;
           throw;
         }
         finally
         {
-          synch.EndMessageLoop();
+          sync.EndMessageLoop();
         }
       }, null);
-      synch.BeginMessageLoop();
+      sync.BeginMessageLoop();
 
       SynchronizationContext.SetSynchronizationContext(oldContext);
     }
@@ -48,7 +48,7 @@ namespace Consul.Net.Tests
       var oldContext = SynchronizationContext.Current;
       var synch = new ExclusiveSynchronizationContext();
       SynchronizationContext.SetSynchronizationContext(synch);
-      T ret = default(T);
+      var ret = default(T);
       synch.Post(async _ =>
       {
         try

@@ -49,34 +49,35 @@ namespace Consul.Net.Tests
 
       var mgmtquerytoken = new QueryOptions {Token = "yep"};
 
-      var def = new PreparedQueryDefinition {Service = new ServiceQuery {Service = "sql"}};
+      var sessionRequest = await client.Session.Create();
+      var sessionId = sessionRequest.Response;
+      
+      var definition = new PreparedQueryDefinition {Service = new ServiceQuery {Service = "sql"}, Session = sessionId};
 
-      var id = (await client.PreparedQuery.Create(def)).Response;
-      def.ID = id;
+      var id = (await client.PreparedQuery.Create(definition)).Response;
+      definition.ID = id;
 
-      var defs = (await client.PreparedQuery.Get(id)).Response;
+      var definitions = (await client.PreparedQuery.Get(id)).Response;
 
-      Assert.NotNull(defs);
-      Assert.True(defs.Length == 1);
-      Assert.Equal(def.Service.Service, defs[0].Service.Service);
+      Assert.NotNull(definitions);
+      Assert.True(definitions.Length == 1);
+      Assert.Equal(definition.Service.Service, definitions[0].Service.Service);
 
-      defs = null;
-      defs = (await client.PreparedQuery.List(mgmtquerytoken)).Response;
+      definitions = (await client.PreparedQuery.List(mgmtquerytoken)).Response;
 
-      Assert.NotNull(defs);
-      Assert.True(defs.Length == 1);
-      Assert.Equal(def.Service.Service, defs[0].Service.Service);
+      Assert.NotNull(definitions);
+      Assert.True(definitions.Length == 1);
+      Assert.Equal(definition.Service.Service, definitions[0].Service.Service);
 
-      def.Name = "my-query";
+      definition.Name = "my-query";
 
-      await client.PreparedQuery.Update(def);
+      await client.PreparedQuery.Update(definition);
 
-      defs = null;
-      defs = (await client.PreparedQuery.Get(id)).Response;
+      definitions = (await client.PreparedQuery.Get(id)).Response;
 
-      Assert.NotNull(defs);
-      Assert.True(defs.Length == 1);
-      Assert.Equal(def.Name, defs[0].Name);
+      Assert.NotNull(definitions);
+      Assert.True(definitions.Length == 1);
+      Assert.Equal(definition.Name, definitions[0].Name);
 
       var results = (await client.PreparedQuery.Execute(id)).Response;
 
@@ -95,10 +96,10 @@ namespace Consul.Net.Tests
 
       await client.PreparedQuery.Delete(id);
 
-      defs = null;
-      defs = (await client.PreparedQuery.List(mgmtquerytoken)).Response;
+      definitions = null;
+      definitions = (await client.PreparedQuery.List(mgmtquerytoken)).Response;
 
-      Assert.True(defs.Length == 0);
+      Assert.True(definitions.Length == 0);
     }
   }
 }

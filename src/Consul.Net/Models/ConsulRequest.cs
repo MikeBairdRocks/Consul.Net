@@ -50,12 +50,11 @@ namespace Consul.Net.Models
       {
         if (!string.IsNullOrEmpty(queryParam.Value))
         {
-          queryParams.Add(string.Format("{0}={1}", Uri.EscapeDataString(queryParam.Key),
-            Uri.EscapeDataString(queryParam.Value)));
+          queryParams.Add($"{Uri.EscapeDataString(queryParam.Key)}={Uri.EscapeDataString(queryParam.Value)}");
         }
         else
         {
-          queryParams.Add(string.Format("{0}", Uri.EscapeDataString(queryParam.Key)));
+          queryParams.Add($"{Uri.EscapeDataString(queryParam.Key)}");
         }
       }
 

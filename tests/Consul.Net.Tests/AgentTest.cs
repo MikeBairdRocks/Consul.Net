@@ -339,7 +339,7 @@ namespace Consul.Net.Tests
           DockerContainerID = "f972c95ebf0e",
           Script = "/bin/true",
           Shell = "/bin/bash",
-          Interval = TimeSpan.FromSeconds(10)
+          TTL = TimeSpan.FromSeconds(10)
         };
         await client.Agent.CheckRegister(reg);
 
@@ -405,7 +405,8 @@ namespace Consul.Net.Tests
     {
       var client = new ConsulClient();
       var info = await client.Agent.Self();
-      await client.Agent.Join(info.Response["Config"]["AdvertiseAddr"], false);
+      var advertiseAddress = info.Response["DebugConfig"]["AdvertiseAddrLAN"];
+      await client.Agent.Join(advertiseAddress, false);
       // Success is not throwing an exception
     }
 

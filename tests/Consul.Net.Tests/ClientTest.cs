@@ -19,7 +19,7 @@ namespace Consul.Net.Tests
 
     public ClientTest()
     {
-      m_lock = AsyncHelpers.RunSync(() => SelectiveParallel.NoParallel());
+      m_lock = AsyncHelpers.RunSync(SelectiveParallel.NoParallel);
     }
 
     public void Dispose()
@@ -58,7 +58,7 @@ namespace Consul.Net.Tests
       Environment.SetEnvironmentVariable("CONSUL_HTTP_SSL_VERIFY", string.Empty);
 
 
-      Assert.True((client.HttpHandler as HttpClientHandler).ServerCertificateCustomValidationCallback(null, null, null,
+      Assert.True(client.HttpHandler.ServerCertificateCustomValidationCallback(null, null, null,
         SslPolicyErrors.RemoteCertificateChainErrors));
 
       Assert.NotNull(client);

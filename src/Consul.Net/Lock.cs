@@ -89,9 +89,9 @@ namespace Consul.Net
   {
     bool IsHeld { get; }
 
-    Task<CancellationToken> Acquire(CancellationToken ct = default(CancellationToken));
-    Task Destroy(CancellationToken ct = default(CancellationToken));
-    Task Release(CancellationToken ct = default(CancellationToken));
+    Task<CancellationToken> Acquire(CancellationToken ct = default);
+    Task Destroy(CancellationToken ct = default);
+    Task Release(CancellationToken ct = default);
   }
   
   /// <summary>
@@ -340,7 +340,7 @@ namespace Consul.Net
     /// <summary>
     /// Unlock released the lock. It is an error to call this if the lock is not currently held.
     /// </summary>
-    public async Task Release(CancellationToken ct = default(CancellationToken))
+    public async Task Release(CancellationToken ct = default)
     {
       try
       {
@@ -378,7 +378,7 @@ namespace Consul.Net
     /// <summary>
     /// Destroy is used to cleanup the lock entry. It is not necessary to invoke. It will fail if the lock is in use.
     /// </summary>
-    public async Task Destroy(CancellationToken ct = default(CancellationToken))
+    public async Task Destroy(CancellationToken ct = default)
     {
       using (await _mutex.LockAsync().ConfigureAwait(false))
       {
