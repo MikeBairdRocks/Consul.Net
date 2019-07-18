@@ -119,6 +119,22 @@ namespace Consul.Net.Tests
     }
 
     [SkippableFact]
+    public async Task ACL_Self()
+    {
+      Skip.If(string.IsNullOrEmpty(ConsulRoot));
+
+      // Arrange
+      var client = new ConsulClient(c => { c.Token = ConsulRoot; });
+      
+      // Act
+      var result = await client.ACL.Self();
+
+      // Assert
+      Assert.NotNull(result.Response);
+      Assert.NotEqual(TimeSpan.Zero, result.RequestTime);
+    }
+    
+    [SkippableFact]
     public async Task ACL_List()
     {
       Skip.If(string.IsNullOrEmpty(ConsulRoot));

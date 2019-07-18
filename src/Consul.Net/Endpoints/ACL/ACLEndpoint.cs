@@ -99,8 +99,8 @@ namespace Consul.Net.Endpoints.ACL
     /// <returns>A query result containing the ACL entry matching the provided ID, or a query result with a null response if no token matched the provided ID</returns>
     public async Task<QueryResult<ACLToken>> Self(QueryOptions options, CancellationToken token = default)
     {
-      var res = await _client.Get<ACLToken[]>($"/v1/acl/self", options).Execute(token).ConfigureAwait(false);
-      return new QueryResult<ACLToken>(res, res.Response != null && res.Response.Length > 0 ? res.Response[0] : null);
+      var result = await _client.Get<ACLToken>($"/v1/acl/token/self", options).Execute(token).ConfigureAwait(false);
+      return result;
     }
     
     /// <summary>
