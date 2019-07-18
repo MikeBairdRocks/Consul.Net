@@ -142,6 +142,8 @@ namespace Consul.Net
     /// </summary>
     private class ConsulClientConfigurationContainer
     {
+      private bool disposedValue; // To detect redundant calls
+      
       internal readonly bool skipClientDispose;
       internal readonly HttpClient HttpClient;
       internal readonly HttpClientHandler HttpHandler;
@@ -159,27 +161,18 @@ namespace Consul.Net
         HttpClient.DefaultRequestHeaders.Add("Keep-Alive", "true");
       }
 
-      private bool disposedValue = false; // To detect redundant calls
-
       protected virtual void Dispose(bool disposing)
       {
-        if (!disposedValue)
+        if (disposedValue) return;
+        if (disposing)
         {
-          if (disposing)
-          {
-            if (HttpClient != null && !skipClientDispose)
-            {
-              HttpClient.Dispose();
-            }
+          if (HttpClient != null && !skipClientDispose)
+            HttpClient.Dispose();
 
-            if (HttpHandler != null)
-            {
-              HttpHandler.Dispose();
-            }
-          }
-
-          disposedValue = true;
+          HttpHandler?.Dispose();
         }
+
+        disposedValue = true;
       }
 
       // This code added to correctly implement the disposable pattern.
@@ -194,7 +187,7 @@ namespace Consul.Net
       {
         if (disposedValue)
         {
-          throw new ObjectDisposedException(typeof(ConsulClientConfigurationContainer).FullName.ToString());
+          throw new ObjectDisposedException(typeof(ConsulClientConfigurationContainer).FullName);
         }
       }
     }
@@ -424,9 +417,7 @@ namespace Consul.Net
     public async Task<IDistributedLock> AcquireLock(LockOptions opts, CancellationToken ct = default)
     {
       if (opts == null)
-      {
         throw new ArgumentNullException(nameof(opts));
-      }
 
       var l = CreateLock(opts);
       await l.Acquire(ct).ConfigureAwait(false);

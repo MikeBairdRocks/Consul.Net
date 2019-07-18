@@ -54,8 +54,8 @@ namespace Consul.Net.Endpoints.ACL
     /// <returns>A write result containing the newly created ACL token</returns>
     public async Task<WriteResult<string>> Create(ACLToken acl, WriteOptions options, CancellationToken token = default)
     {
-      var res = await _client.Put<ACLToken, ACLToken>("/v1/acl/token", acl, options).Execute(token).ConfigureAwait(false);
-      return new WriteResult<string>(res, res.Response.AccessorID);
+      var result = await _client.Put<ACLToken, ACLToken>("/v1/acl/token", acl, options).Execute(token).ConfigureAwait(false);
+      return new WriteResult<string>(result, result.Response.AccessorID);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ namespace Consul.Net.Endpoints.ACL
     /// <returns>An empty write result</returns>
     public Task<WriteResult> Update(ACLToken acl, WriteOptions options, CancellationToken token = default)
     {
-      return _client.Put("/v1/acl/token", acl, options).Execute(token);
+      return _client.Put($"/v1/acl/token/{acl.AccessorID}", acl, options).Execute(token);
     }
 
     /// <summary>
@@ -142,8 +142,8 @@ namespace Consul.Net.Endpoints.ACL
     /// <returns>A write result containing the newly created ACL token</returns>
     public async Task<WriteResult<string>> Clone(string id, WriteOptions options, CancellationToken token = default)
     {
-      var result = await _client.PutReturning<ACLPolicy>($"/v1/acl/clone/{id}", options).Execute(token).ConfigureAwait(false);
-      return new WriteResult<string>(result, result.Response.ID);
+      var result = await _client.PutReturning<ACLToken>($"/v1/acl/token/{id}/clone", options).Execute(token).ConfigureAwait(false);
+      return new WriteResult<string>(result, result.Response.AccessorID);
     }
     
     /// <summary>

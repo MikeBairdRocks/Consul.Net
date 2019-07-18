@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Consul.Net.Endpoints.ACL;
+using Consul.Net.Models;
 using Consul.Net.Utilities;
 using Xunit;
 
@@ -21,62 +22,81 @@ namespace Consul.Net.Tests
     }
 
     internal const string ConsulRoot = "eba37d50-2fd8-42f2-b9f6-9c7c7a55890e";
+    internal const string Description = "API Test";
 
     [SkippableFact]
-    public async Task ACL_CreateDelete()
+    public async Task ACL_Delete()
     {
       Skip.If(string.IsNullOrEmpty(ConsulRoot));
+     
+      // Arrange
       var client = new ConsulClient(c => { c.Token = ConsulRoot; });
-      var acl = new ACLToken
-      {
-        AccessorID = Guid.NewGuid().ToString(),
-        Description = "API Test",
-        Local = false
-      };
-      var res = await client.ACL.Create(acl);
-      var id = res.Response;
+      var acl = await Create(client);
+      var id = acl.Response;
+     
+      // Act
+      var result = await client.ACL.Get(id);
 
-      Assert.NotEqual(TimeSpan.Zero, res.RequestTime);
-      Assert.False(string.IsNullOrEmpty(res.Response));
-      Assert.Equal(acl.AccessorID, id);
-      
-      var acl2 = await client.ACL.Get(id);
-      Assert.NotNull(acl2.Response);
-      Assert.Equal(acl2.Response.Description, acl.Description);
-
+      // Assert
+      Assert.NotNull(result.Response);
+      Assert.Equal(result.Response.Description, Description);
       Assert.True((await client.ACL.Delete(id)).Response);
     }
 
     [SkippableFact]
-    public async Task ACL_CloneUpdateDelete()
+    public async Task ACL_Update()
     {
       Skip.If(string.IsNullOrEmpty(ConsulRoot));
 
-      var client = new ConsulClient(c => { c.Token = ConsulRoot; });
-      var cloneRequest = await client.ACL.Clone(ConsulRoot);
-      var aclID = cloneRequest.Response;
-
-      var aclEntry = await client.ACL.Get(aclID);
+      // Arrange
       const string expectedDescription = "This is a test.";
-      aclEntry.Response.Description = expectedDescription;
-
+      var client = new ConsulClient(c => { c.Token = ConsulRoot; });
+      var acl = await Create(client);
+      var id = acl.Response;
+     
+      // Act
       var updateToken = new ACLToken
       {
-        AccessorID = aclEntry.Response.AccessorID,
-        Description = aclEntry.Response.Description,
+        AccessorID = id,
+        Description = expectedDescription,
         Local = false
       };
-      await client.ACL.Update(updateToken);
-
-      var aclEntry2 = await client.ACL.Get(aclID);
-      Assert.Equal(expectedDescription, aclEntry2.Response.Description);
-
-      var id = cloneRequest.Response;
-
-      Assert.NotEqual(TimeSpan.Zero, cloneRequest.RequestTime);
-      Assert.False(string.IsNullOrEmpty(aclID));
+      var updateResult = await client.ACL.Update(updateToken);
+      var result = await client.ACL.Get(id);
+      
+      // Assert
+      Assert.Equal(expectedDescription, result.Response.Description);
+      Assert.NotEqual(TimeSpan.Zero, updateResult.RequestTime);
+      Assert.NotEqual(TimeSpan.Zero, result.RequestTime);
+      Assert.False(string.IsNullOrEmpty(id));
 
       Assert.True((await client.ACL.Delete(id)).Response);
+    }
+    
+    [SkippableFact]
+    public async Task ACL_Clone()
+    {
+      Skip.If(string.IsNullOrEmpty(ConsulRoot));
+
+      // Arrange
+      var client = new ConsulClient(c => { c.Token = ConsulRoot; });
+      var acl = await Create(client);
+      var id = acl.Response;
+     
+      // Act
+      var cloneResult = await client.ACL.Clone(id);
+      var cloneId = cloneResult.Response;
+      var result = await client.ACL.Get(cloneResult.Response);
+      
+      // Assert
+      Assert.Equal(Description, result.Response.Description);
+      Assert.NotEqual(TimeSpan.Zero, cloneResult.RequestTime);
+      Assert.NotEqual(id, cloneId);
+      Assert.False(string.IsNullOrEmpty(cloneId));
+
+      // Clean up
+      Assert.True((await client.ACL.Delete(id)).Response);
+      Assert.True((await client.ACL.Delete(cloneId)).Response);
     }
 
     [SkippableFact]
@@ -84,13 +104,18 @@ namespace Consul.Net.Tests
     {
       Skip.If(string.IsNullOrEmpty(ConsulRoot));
 
-      var client = new ConsulClient((c) => { c.Token = ConsulRoot; });
+      // Arrange
+      var client = new ConsulClient(c => { c.Token = ConsulRoot; });
+      var acl = await Create(client);
+      var id = acl.Response;
+      
+      // Act
+      var result = await client.ACL.Get(id);
 
-      var aclEntry = await client.ACL.Get(ConsulRoot);
-
-      Assert.NotNull(aclEntry.Response);
-      Assert.NotEqual(TimeSpan.Zero, aclEntry.RequestTime);
-      Assert.Equal(aclEntry.Response.AccessorID, ConsulRoot);
+      // Assert
+      Assert.NotNull(result.Response);
+      Assert.Equal(Description, result.Response.Description);
+      Assert.NotEqual(TimeSpan.Zero, result.RequestTime);
     }
 
     [SkippableFact]
@@ -98,13 +123,33 @@ namespace Consul.Net.Tests
     {
       Skip.If(string.IsNullOrEmpty(ConsulRoot));
 
-      var client = new ConsulClient((c) => { c.Token = ConsulRoot; });
+      // Arrange
+      var client = new ConsulClient(c => { c.Token = ConsulRoot; });
 
-      var aclList = await client.ACL.List();
+      // Act
+      var result = await client.ACL.List();
 
-      Assert.NotNull(aclList.Response);
-      Assert.NotEqual(TimeSpan.Zero, aclList.RequestTime);
-      Assert.True(aclList.Response.Length >= 2);
+      // Assert
+      Assert.NotNull(result.Response);
+      Assert.NotEqual(TimeSpan.Zero, result.RequestTime);
+      Assert.True(result.Response.Length >= 2);
+    }
+    
+    private async Task<WriteResult<string>> Create(IConsulClient client)
+    {
+      var acl = new ACLToken
+      {
+        AccessorID = Guid.NewGuid().ToString(),
+        Description = Description,
+        Local = false
+      };
+      var result = await client.ACL.Create(acl);
+
+      Assert.NotEqual(TimeSpan.Zero, result.RequestTime);
+      Assert.Equal(acl.AccessorID, result.Response);
+      Assert.False(string.IsNullOrEmpty(result.Response));
+      
+      return result;
     }
   }
 }
