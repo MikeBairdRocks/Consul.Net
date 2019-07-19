@@ -10,30 +10,7 @@ namespace Consul.Net.Models
   /// </summary>
   public class ConsulClientConfiguration
   {
-    private NetworkCredential _httpauth;
-    private bool _disableServerCertificateValidation;
-    private X509Certificate2 _clientCertificate;
-
     internal event EventHandler Updated;
-
-    internal static Lazy<bool> _clientCertSupport = new Lazy<bool>(() => { return Type.GetType("Mono.Runtime") == null; });
-
-    internal bool ClientCertificateSupported { get { return _clientCertSupport.Value; } }
-
-    [Obsolete("Use of DisableServerCertificateValidation should be converted to setting the HttpHandler's ServerCertificateCustomValidationCallback in the ConsulClient constructor" +
-              "This property will be removed when 0.8.0 is released.", false)]
-    internal bool DisableServerCertificateValidation
-    {
-      get
-      {
-        return _disableServerCertificateValidation;
-      }
-      set
-      {
-        _disableServerCertificateValidation = value;
-        OnUpdated(new EventArgs());
-      }
-    }
 
     /// <summary>
     /// The Uri to connect to the Consul agent.
@@ -44,50 +21,6 @@ namespace Consul.Net.Models
     /// Datacenter to provide with each request. If not provided, the default agent datacenter is used.
     /// </summary>
     public string Datacenter { get; set; }
-
-    /// <summary>
-    /// Credentials to use for access to the HTTP API.
-    /// This is only needed if an authenticating service exists in front of Consul; Token is used for ACL authentication by Consul.
-    /// </summary>
-    [Obsolete("Use of HttpAuth should be converted to setting the HttpHandler's Credential property in the ConsulClient constructor" +
-              "This property will be removed when 0.8.0 is released.", false)]
-
-    public NetworkCredential HttpAuth
-    {
-      internal get
-      {
-        return _httpauth;
-      }
-      set
-      {
-        _httpauth = value;
-        OnUpdated(new EventArgs());
-      }
-    }
-
-    /// <summary>
-    /// TLS Client Certificate used to secure a connection to a Consul agent. Not supported on Mono.
-    /// This is only needed if an authenticating service exists in front of Consul; Token is used for ACL authentication by Consul. This is not the same as RPC Encryption with TLS certificates.
-    /// </summary>
-    /// <exception cref="PlatformNotSupportedException">Setting this property will throw a PlatformNotSupportedException on Mono</exception>
-    [Obsolete("Use of ClientCertificate should be converted to adding to the HttpHandler's ClientCertificates list in the ConsulClient constructor." +
-              "This property will be removed when 0.8.0 is released.", false)]
-    public X509Certificate2 ClientCertificate
-    {
-      internal get
-      {
-        return _clientCertificate;
-      }
-      set
-      {
-        if (!ClientCertificateSupported)
-        {
-          throw new PlatformNotSupportedException("Client certificates are not supported on this platform");
-        }
-        _clientCertificate = value;
-        OnUpdated(new EventArgs());
-      }
-    }
 
     /// <summary>
     /// Token is used to provide an ACL token which overrides the agent's default token. This ACL token is used for every request by
@@ -140,59 +73,6 @@ namespace Consul.Net.Models
             throw new ConsulConfigurationException("Failed parsing port from environment variable CONSUL_HTTP_ADDR", ex);
           }
         }
-      }
-
-      var useSsl = (Environment.GetEnvironmentVariable("CONSUL_HTTP_SSL") ?? string.Empty).Trim().ToLowerInvariant();
-      if (!string.IsNullOrEmpty(useSsl))
-      {
-        try
-        {
-          if (useSsl == "1" || bool.Parse(useSsl))
-          {
-            consulAddress.Scheme = "https";
-          }
-        }
-        catch (Exception ex)
-        {
-          throw new ConsulConfigurationException("Could not parse environment variable CONSUL_HTTP_SSL", ex);
-        }
-      }
-
-      var verifySsl = (Environment.GetEnvironmentVariable("CONSUL_HTTP_SSL_VERIFY") ?? string.Empty).Trim().ToLowerInvariant();
-      if (!string.IsNullOrEmpty(verifySsl))
-      {
-        try
-        {
-          if (verifySsl == "0" || bool.Parse(verifySsl))
-          {
-#pragma warning disable CS0618 // Type or member is obsolete
-            DisableServerCertificateValidation = true;
-#pragma warning restore CS0618 // Type or member is obsolete
-          }
-        }
-        catch (Exception ex)
-        {
-          throw new ConsulConfigurationException("Could not parse environment variable CONSUL_HTTP_SSL_VERIFY", ex);
-        }
-      }
-
-      var auth = Environment.GetEnvironmentVariable("CONSUL_HTTP_AUTH");
-      if (!string.IsNullOrEmpty(auth))
-      {
-        var credential = new NetworkCredential();
-        if (auth.Contains(":"))
-        {
-          var split = auth.Split(':');
-          credential.UserName = split[0];
-          credential.Password = split[1];
-        }
-        else
-        {
-          credential.UserName = auth;
-        }
-#pragma warning disable CS0618 // Type or member is obsolete
-        HttpAuth = credential;
-#pragma warning restore CS0618 // Type or member is obsolete
       }
 
       if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONSUL_HTTP_TOKEN")))

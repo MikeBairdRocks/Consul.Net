@@ -144,7 +144,6 @@ namespace Consul.Net
     {
       private bool disposedValue; // To detect redundant calls
       
-      internal readonly bool skipClientDispose;
       internal readonly HttpClient HttpClient;
       internal readonly HttpClientHandler HttpHandler;
 
@@ -166,9 +165,7 @@ namespace Consul.Net
         if (disposedValue) return;
         if (disposing)
         {
-          if (HttpClient != null && !skipClientDispose)
-            HttpClient.Dispose();
-
+          HttpClient?.Dispose();
           HttpHandler?.Dispose();
         }
 
@@ -509,44 +506,6 @@ namespace Consul.Net
 
     void ApplyConfig(ConsulClientConfiguration config, HttpClientHandler handler, HttpClient client)
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-      if (config.HttpAuth != null)
-#pragma warning restore CS0618 // Type or member is obsolete
-      {
-#pragma warning disable CS0618 // Type or member is obsolete
-        handler.Credentials = config.HttpAuth;
-#pragma warning restore CS0618 // Type or member is obsolete
-      }
-
-      if (config.ClientCertificateSupported)
-      {
-#pragma warning disable CS0618 // Type or member is obsolete
-        if (config.ClientCertificate != null)
-#pragma warning restore CS0618 // Type or member is obsolete
-        {
-          handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-#pragma warning disable CS0618 // Type or member is obsolete
-          handler.ClientCertificates.Add(config.ClientCertificate);
-#pragma warning restore CS0618 // Type or member is obsolete
-        }
-        else
-        {
-          handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-          handler.ClientCertificates.Clear();
-        }
-      }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-      if (config.DisableServerCertificateValidation)
-#pragma warning restore CS0618 // Type or member is obsolete
-      {
-        handler.ServerCertificateCustomValidationCallback += (certSender, cert, chain, sslPolicyErrors) => { return true; };
-      }
-      else
-      {
-        handler.ServerCertificateCustomValidationCallback = null;
-      }
-
       if (!string.IsNullOrEmpty(config.Token))
       {
         if (client.DefaultRequestHeaders.Contains("X-Consul-Token"))

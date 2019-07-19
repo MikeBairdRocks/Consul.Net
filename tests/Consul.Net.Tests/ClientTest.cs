@@ -44,9 +44,6 @@ namespace Consul.Net.Tests
 
       Assert.Equal(addr, $"{config.Address.Host}:{config.Address.Port}");
       Assert.Equal(token, config.Token);
-      Assert.NotNull(config.HttpAuth);
-      Assert.Equal("username", config.HttpAuth.UserName);
-      Assert.Equal("password", config.HttpAuth.Password);
       Assert.Equal("https", config.Address.Scheme);
 
       Environment.SetEnvironmentVariable("CONSUL_HTTP_ADDR", string.Empty);
@@ -157,14 +154,12 @@ namespace Consul.Net.Tests
     {
       using (var client = new ConsulClient(c => new ConsulClientConfiguration()))
       {
-        client.Config.DisableServerCertificateValidation = true;
         await client.KV.Put(new KVPair("kv/reuseconfig") {Flags = 1000});
         Assert.Equal<ulong>(1000, (await client.KV.Get("kv/reuseconfig")).Response.Flags);
       }
 
       using (var client = new ConsulClient(c => new ConsulClientConfiguration()))
       {
-        client.Config.DisableServerCertificateValidation = false;
         await client.KV.Put(new KVPair("kv/reuseconfig") {Flags = 2000});
         Assert.Equal<ulong>(2000, (await client.KV.Get("kv/reuseconfig")).Response.Flags);
       }
