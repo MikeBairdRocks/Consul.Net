@@ -32,29 +32,17 @@ namespace Consul.Net.Tests
     {
       const string addr = "1.2.3.4:5678";
       const string token = "abcd1234";
-      const string auth = "username:password";
       Environment.SetEnvironmentVariable("CONSUL_HTTP_ADDR", addr);
       Environment.SetEnvironmentVariable("CONSUL_HTTP_TOKEN", token);
-      Environment.SetEnvironmentVariable("CONSUL_HTTP_AUTH", auth);
-      Environment.SetEnvironmentVariable("CONSUL_HTTP_SSL", "1");
-      Environment.SetEnvironmentVariable("CONSUL_HTTP_SSL_VERIFY", "0");
 
       var client = new ConsulClient();
       var config = client.Config;
 
       Assert.Equal(addr, $"{config.Address.Host}:{config.Address.Port}");
       Assert.Equal(token, config.Token);
-      Assert.Equal("https", config.Address.Scheme);
 
       Environment.SetEnvironmentVariable("CONSUL_HTTP_ADDR", string.Empty);
       Environment.SetEnvironmentVariable("CONSUL_HTTP_TOKEN", string.Empty);
-      Environment.SetEnvironmentVariable("CONSUL_HTTP_AUTH", string.Empty);
-      Environment.SetEnvironmentVariable("CONSUL_HTTP_SSL", string.Empty);
-      Environment.SetEnvironmentVariable("CONSUL_HTTP_SSL_VERIFY", string.Empty);
-
-
-      Assert.True(client.HttpHandler.ServerCertificateCustomValidationCallback(null, null, null,
-        SslPolicyErrors.RemoteCertificateChainErrors));
 
       Assert.NotNull(client);
     }
