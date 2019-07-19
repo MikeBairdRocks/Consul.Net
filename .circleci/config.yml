@@ -25,7 +25,7 @@ jobs:
             export PATH="$PATH:/root/.dotnet/tools"
             trx2junit ~/artifacts/junit/results.trx
       - run:
-          - name: remove trx
+            name: remove trx
             command: rm -f ~/artifacts/junit/results.trx
       - store_test_results:
           path: ~/artifacts/junit
