@@ -17,17 +17,17 @@ jobs:
         
     steps: 
       - checkout
-      - run: dotnet test --logger "trx;LogFileName=artifacts/tests/results.trx"
+      - run: dotnet test --logger "trx;LogFileName=/root/project/artifacts/tests/results.trx"
       - run:
           name: test results
           command: |
             dotnet tool install -g trx2junit
             export PATH="$PATH:/root/.dotnet/tools"
-            trx2junit artifacts/tests/*.trx 
+            trx2junit /root/project/artifacts/tests/*.trx 
       - store_test_results:
-          path: artifacts/tests
+          path: /root/project/artifacts/tests
       - store_artifacts:
-          path: artifacts/tests
+          path: /root/project/artifacts/tests
           destination: TestResults
         
 workflows:
