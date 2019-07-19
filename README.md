@@ -1,9 +1,9 @@
 # Consul.NET
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/PlayFab/consuldotnet?branch=master&svg=true)](https://ci.appveyor.com/project/highlyunavailable/consuldotnet)
+[![CircleCI](https://circleci.com/gh/MikeBairdRocks/Consul.Net.svg?style=svg)](https://circleci.com/gh/MikeBairdRocks/Consul.Net)
 
-* Consul API: [v0.7.2](https://github.com/hashicorp/consul/tree/v0.7.2/api)
-* .NET: >= 4.5 - .NET Core: >= 1.0.0
+* Consul API: [v1.5.2](https://github.com/hashicorp/consul/tree/v0.7.2/api)
+* .NET Core: >= 2.0.0
 
 Consul.NET is a .NET port of the Go Consul API, but reworked to use .NET
 idioms such as Tasks/CancellationTokens instead of Goroutines/Channels.
