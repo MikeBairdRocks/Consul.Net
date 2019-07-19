@@ -17,7 +17,7 @@ jobs:
         
     steps: 
       - checkout
-      - run: dotnet test -xml /root/project/tests/results.xml
+      - run: dotnet test --logger "junit;LogFilePath=/root/project/tests/results.xml"
       - store_test_results:
           path: /root/project/tests/
         
