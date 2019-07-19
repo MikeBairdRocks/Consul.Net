@@ -27,8 +27,8 @@ jobs:
       - store_test_results:
           path: tests/TestResults
       - store_artifacts:
-      path: tests/TestResults
-      destination: TestResults
+          path: tests/TestResults
+          destination: TestResults
         
 workflows:
   version: 2
