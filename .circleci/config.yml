@@ -17,9 +17,15 @@ jobs:
         
     steps: 
       - checkout
-      - run: dotnet test --logger "junit;LogFilePath=/root/project/tests/results.xml"
+      - run: dotnet test --logger "trx"
+      - run:
+          name: test results
+          command: |
+            dotnet tool install -g trx2junit
+            export PATH="$PATH:/root/.dotnet/tools"
+            trx2junit tests/**/TestResults/*.trx 
       - store_test_results:
-          path: /root/project/tests/
+          path: artifacts/junit/
         
 workflows:
   version: 2
