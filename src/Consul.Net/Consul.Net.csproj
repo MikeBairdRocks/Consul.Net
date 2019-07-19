@@ -15,6 +15,5 @@
   
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
-    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="4.0.0" />
   </ItemGroup>
 </Project>

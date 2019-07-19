@@ -9,10 +9,9 @@ namespace Consul.Net.Tests
     [Fact]
     public void Assembly_IsStrongNamed()
     {
-      Type type = typeof(ConsulClient);
-      TypeInfo typeInfo = type.GetTypeInfo();
-      string name = typeInfo.Assembly.FullName.ToString();
-      Assert.True(typeInfo.Assembly.FullName.Contains("PublicKeyToken"));
+      var type = typeof(ConsulClient);
+      var typeInfo = type.GetTypeInfo();
+      Assert.Contains("PublicKeyToken", typeInfo.Assembly.FullName);
     }
   }
 }

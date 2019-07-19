@@ -70,7 +70,7 @@ namespace Consul.Net.Tests
     [Fact]
     public void Lock_RetryRange()
     {
-      Assert.Throws(typeof(ArgumentOutOfRangeException), () => new LockOptions("test/lock/retryrange")
+      Assert.Throws<ArgumentOutOfRangeException>(() => new LockOptions("test/lock/retryrange")
       {
         LockRetryTime = TimeSpan.Zero
       });
@@ -683,7 +683,7 @@ namespace Consul.Net.Tests
         try
         {
           var ts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-          await Assert.ThrowsAsync(typeof(LockNotHeldException), () => client.AcquireLock(keyName, ts.Token));
+          await Assert.ThrowsAsync<LockNotHeldException>(() => client.AcquireLock(keyName, ts.Token));
         }
         finally
         {

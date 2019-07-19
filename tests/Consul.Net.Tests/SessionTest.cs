@@ -118,7 +118,7 @@ namespace Consul.Net.Tests
 
       var infoRequest = await client.Session.Info(id);
       Assert.True(infoRequest.LastIndex > 0);
-      Assert.NotNull(infoRequest.KnownLeader);
+      Assert.True(infoRequest.KnownLeader);
 
       Assert.Equal(id, infoRequest.Response.ID);
 
@@ -185,7 +185,7 @@ namespace Consul.Net.Tests
 
       var infoRequest = await client.Session.Info(id);
       Assert.True(infoRequest.LastIndex > 0);
-      Assert.NotNull(infoRequest.KnownLeader);
+      Assert.True(infoRequest.KnownLeader);
 
       Assert.Equal(id, infoRequest.Response.ID);
 
@@ -195,10 +195,10 @@ namespace Consul.Net.Tests
       Assert.Equal(infoRequest.Response.Behavior, SessionBehavior.Release);
 
       Assert.True(string.IsNullOrEmpty(infoRequest.Response.Name));
-      Assert.NotNull(infoRequest.KnownLeader);
+      Assert.True(infoRequest.KnownLeader);
 
       Assert.True(infoRequest.LastIndex > 0);
-      Assert.NotNull(infoRequest.KnownLeader);
+      Assert.True(infoRequest.KnownLeader);
 
       var destroyRequest = await client.Session.Destroy(id);
 

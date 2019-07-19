@@ -38,7 +38,7 @@ namespace Consul.Net.Tests
       Assert.False(string.IsNullOrEmpty(res.Response));
 
       var events = await client.Event.List();
-      Assert.NotEqual(0, events.Response.Length);
+      Assert.NotEmpty(events.Response);
       Assert.Equal(res.Response, events.Response[events.Response.Length - 1].ID);
       Assert.Equal(client.Event.IDToIndex(res.Response), events.LastIndex);
     }

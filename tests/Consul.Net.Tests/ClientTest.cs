@@ -42,7 +42,7 @@ namespace Consul.Net.Tests
       var client = new ConsulClient();
       var config = client.Config;
 
-      Assert.Equal(addr, string.Format("{0}:{1}", config.Address.Host, config.Address.Port));
+      Assert.Equal(addr, $"{config.Address.Host}:{config.Address.Port}");
       Assert.Equal(token, config.Token);
       Assert.NotNull(config.HttpAuth);
       Assert.Equal("username", config.HttpAuth.UserName);
@@ -130,7 +130,7 @@ namespace Consul.Net.Tests
       {
         await client.KV.Put(new KVPair("customhttpclient") {Value = System.Text.Encoding.UTF8.GetBytes("hello world")});
         Assert.Equal(TimeSpan.FromDays(10), client.HttpClient.Timeout);
-        Assert.True(client.HttpClient.DefaultRequestHeaders.Accept.Contains(new MediaTypeWithQualityHeaderValue("application/json")));
+        Assert.Contains(new MediaTypeWithQualityHeaderValue("application/json"), client.HttpClient.DefaultRequestHeaders.Accept);
         Assert.Equal("hello world", await (await client.HttpClient.GetAsync("http://localhost:8500/v1/kv/customhttpclient?raw")).Content.ReadAsStringAsync());
       }
     }

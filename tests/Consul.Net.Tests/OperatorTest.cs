@@ -27,7 +27,7 @@ namespace Consul.Net.Tests
       {
         var servers = await client.Operator.RaftGetConfiguration();
 
-        Assert.Equal(1, servers.Response.Servers.Count);
+        Assert.Single(servers.Response.Servers);
         Assert.True(servers.Response.Servers[0].Leader);
         Assert.True(servers.Response.Servers[0].Voter);
       }

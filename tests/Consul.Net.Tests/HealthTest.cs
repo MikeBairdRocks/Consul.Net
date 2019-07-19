@@ -31,7 +31,7 @@ namespace Consul.Net.Tests
       var checks = await client.Health.Node((string) info.Response["Config"]["NodeName"]);
 
       Assert.NotEqual((ulong) 0, checks.LastIndex);
-      Assert.NotEqual(0, checks.Response.Length);
+      Assert.NotEmpty(checks.Response);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ namespace Consul.Net.Tests
         await client.Agent.ServiceRegister(registration);
         var checks = await client.Health.Checks(svcID);
         Assert.NotEqual((ulong) 0, checks.LastIndex);
-        Assert.NotEqual(0, checks.Response.Length);
+        Assert.NotEmpty(checks.Response);
       }
       finally
       {
@@ -69,7 +69,7 @@ namespace Consul.Net.Tests
 
       var checks = await client.Health.Service("consul", "", false);
       Assert.NotEqual((ulong) 0, checks.LastIndex);
-      Assert.NotEqual(0, checks.Response.Length);
+      Assert.NotEmpty(checks.Response);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ namespace Consul.Net.Tests
 
       var checks = await client.Health.State(HealthStatus.Any);
       Assert.NotEqual((ulong) 0, checks.LastIndex);
-      Assert.NotEqual(0, checks.Response.Length);
+      Assert.NotEmpty(checks.Response);
     }
 
     private struct AggregatedStatusResult

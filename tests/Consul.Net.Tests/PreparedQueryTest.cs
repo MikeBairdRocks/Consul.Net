@@ -84,7 +84,7 @@ namespace Consul.Net.Tests
       Assert.NotNull(results);
       var nodes = results.Nodes.Where(n => n.Node.Name == "foobaz").ToArray();
       Assert.True(nodes.Length == 1);
-      Assert.Equal(nodes[0].Node.Name, "foobaz");
+      Assert.Equal("foobaz", nodes[0].Node.Name);
 
       results = null;
       results = (await client.PreparedQuery.Execute("my-query")).Response;
@@ -92,7 +92,7 @@ namespace Consul.Net.Tests
       Assert.NotNull(results);
       nodes = results.Nodes.Where(n => n.Node.Name == "foobaz").ToArray();
       Assert.True(nodes.Length == 1);
-      Assert.Equal(results.Nodes[0].Node.Name, "foobaz");
+      Assert.Equal("foobaz", results.Nodes[0].Node.Name);
 
       await client.PreparedQuery.Delete(id);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Consul.Net.Endpoints.Agent;
@@ -42,7 +43,7 @@ namespace Consul.Net.Tests
       var members = await client.Agent.Members(false);
 
       Assert.NotNull(members);
-      Assert.Equal(1, members.Response.Length);
+      Assert.Single(members.Response);
     }
 
     [Fact]
@@ -450,7 +451,7 @@ namespace Consul.Net.Tests
       checks = await client.Agent.Checks();
       foreach (var check in checks.Response)
       {
-        Assert.False(check.Value.CheckID.Contains("maintenance"));
+        Assert.DoesNotContain("maintenance", check.Value.CheckID);
       }
 
       await client.Agent.ServiceDeregister(svcID);
@@ -482,7 +483,7 @@ namespace Consul.Net.Tests
       checks = await client.Agent.Checks();
       foreach (var check in checks.Response)
       {
-        Assert.False(check.Value.CheckID.Contains("maintenance"));
+        Assert.DoesNotContain("maintenance", check.Value.CheckID);
       }
     }
 

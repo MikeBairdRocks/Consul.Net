@@ -28,7 +28,7 @@ namespace Consul.Net.Tests
       var client = new ConsulClient();
       var datacenterList = await client.Catalog.Datacenters();
 
-      Assert.NotEqual(0, datacenterList.Response.Length);
+      Assert.NotEmpty(datacenterList.Response);
     }
 
     [Fact]
@@ -38,7 +38,7 @@ namespace Consul.Net.Tests
       var nodeList = await client.Catalog.Nodes();
 
       Assert.NotEqual((ulong) 0, nodeList.LastIndex);
-      Assert.NotEqual(0, nodeList.Response.Length);
+      Assert.NotEmpty(nodeList.Response);
       // make sure deserialization is working right
       Assert.NotNull(nodeList.Response[0].Address);
       Assert.NotNull(nodeList.Response[0].Name);
@@ -51,7 +51,7 @@ namespace Consul.Net.Tests
       var servicesList = await client.Catalog.Services();
 
       Assert.NotEqual((ulong) 0, servicesList.LastIndex);
-      Assert.NotEqual(0, servicesList.Response.Count);
+      Assert.NotEmpty(servicesList.Response);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ namespace Consul.Net.Tests
       var serviceList = await client.Catalog.Service("consul");
 
       Assert.NotEqual((ulong) 0, serviceList.LastIndex);
-      Assert.NotEqual(0, serviceList.Response.Length);
+      Assert.NotEmpty(serviceList.Response);
     }
 
     [Fact]
@@ -129,7 +129,7 @@ namespace Consul.Net.Tests
       await client.Catalog.Deregister(dereg);
 
       health = await client.Health.Node("foobar");
-      Assert.Equal(0, health.Response.Length);
+      Assert.Empty(health.Response);
 
       dereg = new CatalogDeregistration
       {
