@@ -17,7 +17,9 @@ jobs:
         
     steps: 
       - checkout
-      - run: dotnet test
+      - run: dotnet test -xml /root/project/tests/results.xml
+      - store_test_results:
+          path: /root/project/tests/
         
 workflows:
   version: 2
