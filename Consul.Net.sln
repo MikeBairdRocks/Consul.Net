@@ -13,6 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consul.Net", "src\Consul.Ne
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consul.Net.Tests", "tests\Consul.Net.Tests\Consul.Net.Tests.csproj", "{F2EC0FFE-E7EF-4587-8688-4491360EB3E4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".circleci", ".circleci", "{6201A3DE-D957-4538-88C1-5B1CEADB3195}"
+ProjectSection(SolutionItems) = preProject
+	..\..\..\..\..\..\System\Volumes\Data\Users\michael.baird\Documents\Dev\OSS\Consul.Net\.circleci\config.yml = ..\..\..\..\..\..\System\Volumes\Data\Users\michael.baird\Documents\Dev\OSS\Consul.Net\.circleci\config.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

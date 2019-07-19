@@ -67,7 +67,7 @@ namespace Consul.Net.Endpoints.ACL
     /// The default unset value represents NO expiration. This value must be between 1 minute and 24 hours in the future. Added in Consul 1.5.0.
     /// </summary>
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public TimeSpan? ExpirationTime { get; set; }
+    public string ExpirationTime { get; set; }
 
     /// <summary>
     /// This is a convenience field and if set will initialize the ExpirationTime field to a value of CreateTime + ExpirationTTL.

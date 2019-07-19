@@ -47,7 +47,7 @@ namespace Consul.Net.Tests
 
       Assert.NotNull((await client.Catalog.Node("foobaz")).Response);
 
-      var mgmtquerytoken = new QueryOptions {Token = "yep"};
+      var queryOptions = new QueryOptions {Token = "eba37d50-2fd8-42f2-b9f6-9c7c7a55890e"};
 
       var sessionRequest = await client.Session.Create();
       var sessionId = sessionRequest.Response;
@@ -63,7 +63,7 @@ namespace Consul.Net.Tests
       Assert.True(definitions.Length == 1);
       Assert.Equal(definition.Service.Service, definitions[0].Service.Service);
 
-      definitions = (await client.PreparedQuery.List(mgmtquerytoken)).Response;
+      definitions = (await client.PreparedQuery.List(queryOptions)).Response;
 
       Assert.NotNull(definitions);
       Assert.True(definitions.Length == 1);
@@ -97,7 +97,7 @@ namespace Consul.Net.Tests
       await client.PreparedQuery.Delete(id);
 
       definitions = null;
-      definitions = (await client.PreparedQuery.List(mgmtquerytoken)).Response;
+      definitions = (await client.PreparedQuery.List(queryOptions)).Response;
 
       Assert.True(definitions.Length == 0);
     }
