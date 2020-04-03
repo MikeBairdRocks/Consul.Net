@@ -17,12 +17,6 @@ using static Nuke.Common.Tools.Docker.DockerTasks;
 [CheckBuildProjectConfigurations]
 [DotNetVerbosityMapping]
 [UnsetVisualStudioEnvironmentVariables]
-[GitHubActions("Test", 
-  GitHubActionsImage.UbuntuLatest,
-  AutoGenerate = true,
-  On = new[] { GitHubActionsTrigger.PullRequest, GitHubActionsTrigger.Push },
-  ImportGitHubTokenAs = nameof(GitHubToken),
-  InvokedTargets = new[] { nameof(Test) })]
 class Build : NukeBuild
 {
   public static int Main() => Execute<Build>(x => x.Compile);

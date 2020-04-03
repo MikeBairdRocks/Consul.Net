@@ -13,4 +13,8 @@
     <PackageDownload Include="GitVersion.Tool" Version="[5.1.1]" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="..\.github\workflows\Test.yml" />
+  </ItemGroup>
+
 </Project>
