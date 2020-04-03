@@ -32,4 +32,4 @@ jobs:
         run: dotnet build ./Consul.Net.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=tests.xml"
+        run: dotnet test --no-restore --verbosity normal --filter speed!=slow --logger "trx;LogFileName=tests.xml"
