@@ -98,6 +98,7 @@ namespace Consul.Net.Models
       {
         Params["dc"] = Options.Datacenter;
       }
+
       switch (Options.Consistency)
       {
         case ConsistencyMode.Consistent:
@@ -113,10 +114,12 @@ namespace Consul.Net.Models
       {
         Params["index"] = Options.WaitIndex.ToString();
       }
+
       if (Options.WaitTime.HasValue)
       {
         Params["wait"] = Options.WaitTime.Value.ToGoDuration();
       }
+
       if (!string.IsNullOrEmpty(Options.Near))
       {
         Params["near"] = Options.Near;

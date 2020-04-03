@@ -7,7 +7,11 @@ namespace Consul.Net.Endpoints.Agent
   /// </summary>
   public class AgentService
   {
+    /// <summary>
+    /// Specifies a unique ID for this service. This must be unique per agent. This defaults to the Name parameter if not provided.
+    /// </summary>
     public string ID { get; set; }
+
     public string Service { get; set; }
     public string[] Tags { get; set; }
     public int Port { get; set; }

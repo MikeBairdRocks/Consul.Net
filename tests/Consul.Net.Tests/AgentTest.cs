@@ -15,7 +15,7 @@ namespace Consul.Net.Tests
 
     public AgentTest()
     {
-      m_lock = AsyncHelpers.RunSync(() => SelectiveParallel.Parallel());
+      m_lock = AsyncHelpers.RunSync(SelectiveParallel.Parallel);
     }
 
     public void Dispose()
@@ -26,34 +26,40 @@ namespace Consul.Net.Tests
     [Fact]
     public async Task Agent_Self()
     {
+      // Arrange
       var client = new ConsulClient();
 
-      var info = await client.Agent.Self();
+      // Act
+      var result = await client.Agent.Self();
 
-      Assert.NotNull(info);
-      Assert.False(string.IsNullOrEmpty(info.Response["Config"]["NodeName"]));
-      Assert.False(string.IsNullOrEmpty(info.Response["Member"]["Tags"]["bootstrap"].ToString()));
+      // Assert
+      Assert.NotNull(result);
+      Assert.False(string.IsNullOrEmpty(result.Response["Config"]["NodeName"]));
+      Assert.False(string.IsNullOrEmpty(result.Response["Member"]["Tags"]["bootstrap"].ToString()));
     }
 
     [Fact]
     public async Task Agent_Members()
     {
+      // Arrange
       var client = new ConsulClient();
 
-      var members = await client.Agent.Members(false);
+      // Act
+      var result = await client.Agent.Members(false);
 
-      Assert.NotNull(members);
-      Assert.Single(members.Response);
+      Assert.NotNull(result);
+      Assert.Single(result.Response);
     }
 
     [Fact]
     public async Task Agent_Services()
     {
+      // Arrange
       var client = new ConsulClient();
-      var svcID = KVTest.GenerateTestKeyName();
+      var serviceId = KVTest.GenerateTestKeyName();
       var registration = new AgentServiceRegistration
       {
-        Name = svcID,
+        Name = serviceId,
         Tags = new[] {"bar", "baz"},
         Port = 8000,
         Check = new AgentServiceCheck
@@ -62,27 +68,28 @@ namespace Consul.Net.Tests
         }
       };
 
+      // Act
       await client.Agent.ServiceRegister(registration);
+      var result = await client.Agent.Services();
 
-      var services = await client.Agent.Services();
-      Assert.True(services.Response.ContainsKey(svcID));
-
+      // Assert
+      Assert.True(result.Response.ContainsKey(serviceId));
       var checks = await client.Agent.Checks();
-      Assert.True(checks.Response.ContainsKey("service:" + svcID));
+      Assert.True(checks.Response.ContainsKey($"service:{serviceId}"));
+      Assert.Equal(HealthStatus.Critical, checks.Response[$"service:{serviceId}"].Status);
 
-      Assert.Equal(HealthStatus.Critical, checks.Response["service:" + svcID].Status);
-
-      await client.Agent.ServiceDeregister(svcID);
+      await client.Agent.ServiceDeregister(serviceId);
     }
 
     [Fact]
     public async Task Agent_Services_CheckPassing()
     {
+      // Arrange
       var client = new ConsulClient();
-      var svcID = KVTest.GenerateTestKeyName();
+      var serviceId = KVTest.GenerateTestKeyName();
       var registration = new AgentServiceRegistration
       {
-        Name = svcID,
+        Name = serviceId,
         Tags = new[] {"bar", "baz"},
         Port = 8000,
         Check = new AgentServiceCheck
@@ -92,27 +99,28 @@ namespace Consul.Net.Tests
         }
       };
 
+      // Act
       await client.Agent.ServiceRegister(registration);
+      var result = await client.Agent.Services();
 
-      var services = await client.Agent.Services();
-      Assert.True(services.Response.ContainsKey(svcID));
-
+      // Assert
+      Assert.True(result.Response.ContainsKey(serviceId));
       var checks = await client.Agent.Checks();
-      Assert.True(checks.Response.ContainsKey("service:" + svcID));
+      Assert.True(checks.Response.ContainsKey($"service:{serviceId}"));
+      Assert.Equal(HealthStatus.Passing, checks.Response[$"service:{serviceId}"].Status);
 
-      Assert.Equal(HealthStatus.Passing, checks.Response["service:" + svcID].Status);
-
-      await client.Agent.ServiceDeregister(svcID);
+      await client.Agent.ServiceDeregister(serviceId);
     }
 
     [Fact]
     public async Task Agent_Services_CheckTTLNote()
     {
+      // Arrange
       var client = new ConsulClient();
-      var svcID = KVTest.GenerateTestKeyName();
+      var serviceId = KVTest.GenerateTestKeyName();
       var registration = new AgentServiceRegistration
       {
-        Name = svcID,
+        Name = serviceId,
         Tags = new[] {"bar", "baz"},
         Port = 8000,
         Check = new AgentServiceCheck
@@ -125,21 +133,21 @@ namespace Consul.Net.Tests
       await client.Agent.ServiceRegister(registration);
 
       var services = await client.Agent.Services();
-      Assert.True(services.Response.ContainsKey(svcID));
+      Assert.True(services.Response.ContainsKey(serviceId));
 
       var checks = await client.Agent.Checks();
-      Assert.True(checks.Response.ContainsKey("service:" + svcID));
+      Assert.True(checks.Response.ContainsKey("service:" + serviceId));
 
-      Assert.Equal(HealthStatus.Critical, checks.Response["service:" + svcID].Status);
+      Assert.Equal(HealthStatus.Critical, checks.Response["service:" + serviceId].Status);
 
-      await client.Agent.PassTTL("service:" + svcID, "test is ok");
+      await client.Agent.PassTTL("service:" + serviceId, "test is ok");
       checks = await client.Agent.Checks();
 
-      Assert.True(checks.Response.ContainsKey("service:" + svcID));
-      Assert.Equal(HealthStatus.Passing, checks.Response["service:" + svcID].Status);
-      Assert.Equal("test is ok", checks.Response["service:" + svcID].Output);
+      Assert.True(checks.Response.ContainsKey("service:" + serviceId));
+      Assert.Equal(HealthStatus.Passing, checks.Response["service:" + serviceId].Status);
+      Assert.Equal("test is ok", checks.Response["service:" + serviceId].Output);
 
-      await client.Agent.ServiceDeregister(svcID);
+      await client.Agent.ServiceDeregister(serviceId);
     }
 
     [Fact]

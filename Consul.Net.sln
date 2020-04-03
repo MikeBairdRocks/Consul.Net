@@ -14,10 +14,22 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consul.Net.Tests", "tests\Consul.Net.Tests\Consul.Net.Tests.csproj", "{F2EC0FFE-E7EF-4587-8688-4491360EB3E4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".circleci", ".circleci", "{6201A3DE-D957-4538-88C1-5B1CEADB3195}"
-ProjectSection(SolutionItems) = preProject
-	..\..\..\..\..\..\System\Volumes\Data\Users\michael.baird\Documents\Dev\OSS\Consul.Net\.circleci\config.yml = ..\..\..\..\..\..\System\Volumes\Data\Users\michael.baird\Documents\Dev\OSS\Consul.Net\.circleci\config.yml
-	.circleci\config.yml = .circleci\config.yml
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		.circleci\config.yml = .circleci\config.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{32FAF37E-CAD6-43F7-B175-AFF00C14D9C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebRegisteringService", "samples\WebRegisteringService\WebRegisteringService.csproj", "{7A24C5D4-3CC1-4623-8166-8A672EE86718}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{C3F46C45-FEE2-49C7-BEBC-2A3C448C9804}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{080C26F3-5285-4D0E-B7BC-AC2A21339E19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{76106D4F-4666-42D0-BAB4-7C536B8752EC}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\main.yml = .github\workflows\main.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +45,12 @@ Global
 		{F2EC0FFE-E7EF-4587-8688-4491360EB3E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2EC0FFE-E7EF-4587-8688-4491360EB3E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2EC0FFE-E7EF-4587-8688-4491360EB3E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A24C5D4-3CC1-4623-8166-8A672EE86718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A24C5D4-3CC1-4623-8166-8A672EE86718}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A24C5D4-3CC1-4623-8166-8A672EE86718}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A24C5D4-3CC1-4623-8166-8A672EE86718}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3F46C45-FEE2-49C7-BEBC-2A3C448C9804}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F46C45-FEE2-49C7-BEBC-2A3C448C9804}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -40,6 +58,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A9195C66-A204-4B3C-9494-0DB8F3BB76B4} = {B88C1006-A6EB-4128-A857-EE02DA008E80}
 		{F2EC0FFE-E7EF-4587-8688-4491360EB3E4} = {673B2382-ECEC-4644-9258-11A24646015C}
+		{7A24C5D4-3CC1-4623-8166-8A672EE86718} = {32FAF37E-CAD6-43F7-B175-AFF00C14D9C1}
+		{C3F46C45-FEE2-49C7-BEBC-2A3C448C9804} = {BD73E3B1-EDEE-4844-ACA5-0478471C0D46}
+		{76106D4F-4666-42D0-BAB4-7C536B8752EC} = {080C26F3-5285-4D0E-B7BC-AC2A21339E19}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {03949D07-DF25-43D6-8C8F-CB93FFBFE29B}

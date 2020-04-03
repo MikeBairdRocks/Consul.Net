@@ -253,9 +253,9 @@ namespace Consul.Net.Tests
             var semaphore = client.Semaphore(keyName, 2);
             await semaphore.Acquire(CancellationToken.None);
             acquired[v] = semaphore.IsHeld;
-            await Task.Delay(1000);
-            await semaphore.Release();
-          }));
+            await Task.Delay(1000, cts.Token);
+            await semaphore.Release(cts.Token);
+          }, cts.Token));
         }
 
         await Task.WhenAny(Task.WhenAll(tasks), Task.Delay(Timeout.Infinite, cts.Token));
@@ -296,8 +296,8 @@ namespace Consul.Net.Tests
             var semaphore = client.Semaphore(keyName, 2);
             await semaphore.Acquire(CancellationToken.None);
             acquired[v] = semaphore.IsHeld;
-            await semaphore.Release();
-          }));
+            await semaphore.Release(cts.Token);
+          }, cts.Token));
         }
 
         await Task.WhenAny(Task.WhenAll(tasks), Task.Delay(Timeout.Infinite, cts.Token));

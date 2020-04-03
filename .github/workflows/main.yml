@@ -1,0 +1,35 @@
+name: main
+
+on:
+  push:
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      consul:
+        image: consul:1.5.2
+        ports:
+          - 8500:8500
+        env:
+          CONSUL_LOCAL_CONFIG: '{ "ui": true, "bind_addr": "127.0.0.1", "client_addr": "0.0.0.0", "server": true, "bootstrap": true, "acl_datacenter": "dc1", "acl_master_token": "eba37d50-2fd8-42f2-b9f6-9c7c7a55890e", "acl_default_policy": "allow", "encrypt": "d8wu8CSUrqgtjVsvcBPmhQ==" }'
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.200
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build ./Consul.Net.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=tests.xml"

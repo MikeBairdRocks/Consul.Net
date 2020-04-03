@@ -1,19 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections;
 using Consul.Net.Models;
 using Consul.Net.Utilities;
+
 
 namespace Consul.Net.Endpoints.Agent
 {
   public interface IAgentEndpoint
   {
-    Task<WriteResult> CheckDeregister(string checkID, CancellationToken ct = default(CancellationToken));
-    Task<WriteResult> CheckRegister(AgentCheckRegistration check, CancellationToken ct = default(CancellationToken));
-    Task<QueryResult<Dictionary<string, AgentCheck>>> Checks(CancellationToken ct = default(CancellationToken));
+    Task<WriteResult> CheckDeregister(string checkID, CancellationToken cancellationToken = default(CancellationToken));
+    Task<WriteResult> CheckRegister(AgentCheckRegistration check, CancellationToken cancellationToken = default(CancellationToken));
+    Task<QueryResult<Dictionary<string, AgentCheck>>> Checks(CancellationToken cancellationToken = default(CancellationToken));
     Task<WriteResult> DisableNodeMaintenance(CancellationToken ct = default(CancellationToken));
     Task<WriteResult> DisableServiceMaintenance(string serviceID, CancellationToken ct = default(CancellationToken));
     Task<WriteResult> EnableNodeMaintenance(string reason, CancellationToken ct = default(CancellationToken));
@@ -69,27 +70,20 @@ namespace Consul.Net.Endpoints.Agent
     /// </summary>
     public async Task<string> GetNodeName(CancellationToken ct = default)
     {
-      if (_nodeName == null)
-      {
-        using (await _nodeNameLock.LockAsync().ConfigureAwait(false))
-        {
-          if (_nodeName == null)
-          {
-            _nodeName = (await Self(ct)).Response["Config"]["NodeName"];
-          }
-        }
-      }
+      if (_nodeName != null) return _nodeName;
 
-      return _nodeName;
+      using var releaser = await _nodeNameLock.LockAsync().ConfigureAwait(false);
+      return _nodeName ??= (await Self(ct)).Response["Config"]["NodeName"];
+
     }
 
     /// <summary>
     /// Checks returns the locally registered checks
     /// </summary>
     /// <returns>A map of the registered check names and check data</returns>
-    public Task<QueryResult<Dictionary<string, AgentCheck>>> Checks(CancellationToken ct = default)
+    public Task<QueryResult<Dictionary<string, AgentCheck>>> Checks(CancellationToken cancellationToken = default)
     {
-      return _client.Get<Dictionary<string, AgentCheck>>("/v1/agent/checks").Execute(ct);
+      return _client.Get<Dictionary<string, AgentCheck>>("/v1/agent/checks").Execute(cancellationToken);
     }
 
     /// <summary>
@@ -197,9 +191,9 @@ namespace Consul.Net.Endpoints.Agent
     /// </summary>
     /// <param name="check">A check registration object</param>
     /// <returns>An empty write result</returns>
-    public Task<WriteResult> CheckRegister(AgentCheckRegistration check, CancellationToken ct = default)
+    public Task<WriteResult> CheckRegister(AgentCheckRegistration check, CancellationToken cancellationToken = default)
     {
-      return _client.Put("/v1/agent/check/register", check).Execute(ct);
+      return _client.Put("/v1/agent/check/register", check).Execute(cancellationToken);
     }
 
     /// <summary>

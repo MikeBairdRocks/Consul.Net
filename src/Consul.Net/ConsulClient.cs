@@ -70,7 +70,7 @@ namespace Consul.Net
     private Lazy<StatusEndpoint> _status;
     private Lazy<RawEndpoint> _raw;
     private Lazy<AgentEndpoint> _agent;
-    
+
     /// <summary>
     /// ACL returns a handle to the ACL endpoints
     /// </summary>
@@ -130,12 +130,12 @@ namespace Consul.Net
     /// Raw returns a handle to query endpoints
     /// </summary>
     public IRawEndpoint Raw => _raw.Value;
-    
+
     /// <summary>
     /// Agent returns a handle to the agent endpoints
     /// </summary>
     public IAgentEndpoint Agent => _agent.Value;
-    
+
     /// <summary>
     /// This class is used to group all the configurable bits of a ConsulClient into a single pointer reference
     /// which is great for implementing reconfiguration later.
@@ -143,7 +143,7 @@ namespace Consul.Net
     private class ConsulClientConfigurationContainer
     {
       private bool disposedValue; // To detect redundant calls
-      
+
       internal readonly HttpClient HttpClient;
       internal readonly HttpClientHandler HttpHandler;
 
@@ -154,8 +154,7 @@ namespace Consul.Net
         Config = new ConsulClientConfiguration();
         HttpHandler = new HttpClientHandler();
 
-        HttpClient = new HttpClient(HttpHandler);
-        HttpClient.Timeout = TimeSpan.FromMinutes(15);
+        HttpClient = new HttpClient(HttpHandler) { Timeout = TimeSpan.FromMinutes(15) };
         HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         HttpClient.DefaultRequestHeaders.Add("Keep-Alive", "true");
       }
@@ -296,7 +295,7 @@ namespace Consul.Net
       }
       return new Semaphore(this) { Opts = opts };
     }
-    
+
     public Task<IDistributedSemaphore> AcquireSemaphore(string prefix, int limit, CancellationToken ct = default(CancellationToken))
     {
       if (string.IsNullOrEmpty(prefix))
@@ -309,7 +308,7 @@ namespace Consul.Net
       }
       return AcquireSemaphore(new SemaphoreOptions(prefix, limit), ct);
     }
-    
+
     public async Task<IDistributedSemaphore> AcquireSemaphore(SemaphoreOptions opts, CancellationToken ct = default(CancellationToken))
     {
       if (opts == null)
@@ -361,7 +360,7 @@ namespace Consul.Net
         await semaphore.Release(ct).ConfigureAwait(false);
       }
     }
-    
+
     /// <summary>
     /// CreateLock returns an unlocked lock which can be used to acquire and release the mutex. The key used must have write permissions.
     /// </summary>
@@ -446,7 +445,7 @@ namespace Consul.Net
     {
       if (opts == null)
         throw new ArgumentNullException(nameof(opts));
-      
+
       if (action == null)
         throw new ArgumentNullException(nameof(action));
 
@@ -465,7 +464,7 @@ namespace Consul.Net
         await l.Release().ConfigureAwait(false);
       }
     }
-    
+
     private bool disposedValue = false; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)
